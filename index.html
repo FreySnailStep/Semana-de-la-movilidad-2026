@@ -1,4 +1,1419 @@
-         responsive:true,
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SnailStep · Dashboard Live</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <style>
+    :root{
+      --green:#01534f;
+      --green-soft:#e6f6f1;
+      --green-soft-2:#d7efe8;
+      --blue:#185FA5;
+      --blue-soft:#EAF2FC;
+      --purple:#534AB7;
+      --purple-soft:#F0EEFE;
+      --amber:#B97418;
+      --amber-soft:#FFF1DE;
+      --red:#A32D2D;
+      --red-soft:#FDEEEE;
+      --ink:#171816;
+      --muted:#686b66;
+      --faint:#969b95;
+      --surface:#ffffff;
+      --line:rgba(10,20,15,.08);
+      --shadow:0 10px 30px rgba(10,20,15,.06);
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(1,83,79,.05), transparent 28%),
+        linear-gradient(180deg, #f7f8f5 0%, #f3f4f1 100%);
+      color:var(--ink);
+      font-size:14px;
+      line-height:1.4;
+    }
+
+    .shell{
+      max-width:1280px;
+      margin:0 auto;
+      padding:24px 18px 40px;
+    }
+
+    .hero{
+      background:linear-gradient(135deg, rgba(1,83,79,.98) 0%, rgba(14,102,95,.96) 60%, rgba(24,95,165,.88) 100%);
+      color:#fff;
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:22px;
+      margin-bottom:18px;
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.08);
+    }
+
+    .hero::after{
+      content:"";
+      position:absolute;
+      right:-40px;
+      top:-40px;
+      width:180px;
+      height:180px;
+      border-radius:50%;
+      background:rgba(255,255,255,.08);
+      filter:blur(6px);
+    }
+
+    .hero-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      flex-wrap:wrap;
+      position:relative;
+      z-index:1;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+      flex-wrap:wrap;
+    }
+
+    .brand-logo-wrap{
+      height:34px;
+      display:flex;
+      align-items:center;
+    }
+
+    .brand-logo-img{
+      height:34px;
+      width:auto;
+      display:block;
+      object-fit:contain;
+      filter:brightness(0) invert(1);
+    }
+
+    .brand-copy h1{
+      margin:0;
+      font-size:20px;
+      line-height:1.1;
+      letter-spacing:-.02em;
+      font-weight:800;
+    }
+
+    .brand-copy p{
+      margin:6px 0 0;
+      font-size:13px;
+      color:rgba(255,255,255,.82);
+    }
+
+    .hero-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .status-chip{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.14);
+      font-size:12px;
+      color:#fff;
+      backdrop-filter:blur(6px);
+    }
+
+    .live-dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#6dffbf;
+      box-shadow:0 0 0 0 rgba(109,255,191,.65);
+      animation:pulse 1.8s infinite;
+      flex-shrink:0;
+    }
+
+    @keyframes pulse{
+      0%{box-shadow:0 0 0 0 rgba(109,255,191,.55)}
+      70%{box-shadow:0 0 0 9px rgba(109,255,191,0)}
+      100%{box-shadow:0 0 0 0 rgba(109,255,191,0)}
+    }
+
+    .btn{
+      border:none;
+      border-radius:999px;
+      padding:10px 16px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.18s ease;
+      font-size:12px;
+    }
+
+    .btn-primary{
+      background:#fff;
+      color:var(--green);
+    }
+
+    .btn-primary:hover{
+      transform:translateY(-1px);
+      box-shadow:0 8px 22px rgba(0,0,0,.10);
+    }
+
+    .btn-primary.loading{
+      opacity:.65;
+      pointer-events:none;
+    }
+
+    .btn-secondary{
+      background:#edf2ee;
+      color:var(--muted);
+      border:1px solid var(--line);
+    }
+
+    .btn-secondary:hover{
+      background:#e7ece8;
+    }
+
+    .config{
+      margin-top:16px;
+      background:rgba(255,255,255,.1);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:16px;
+      padding:14px 16px;
+      font-size:12px;
+      color:rgba(255,255,255,.88);
+      position:relative;
+      z-index:1;
+    }
+
+    .config code{
+      background:rgba(255,255,255,.14);
+      padding:2px 6px;
+      border-radius:8px;
+      color:#fff;
+      font-size:11px;
+    }
+
+    .bar{
+      display:none;
+      margin-bottom:14px;
+      padding:13px 16px;
+      border-radius:14px;
+      font-size:13px;
+      border:1px solid;
+    }
+
+    .bar.loading{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      background:var(--green-soft);
+      color:var(--green);
+      border-color:rgba(1,83,79,.12);
+    }
+
+    .bar.error{
+      background:var(--red-soft);
+      color:var(--red);
+      border-color:rgba(163,45,45,.2);
+    }
+
+    .bar.empty{
+      background:var(--amber-soft);
+      color:#8b5a12;
+      border-color:rgba(185,116,24,.18);
+    }
+
+    .spinner{
+      width:16px;
+      height:16px;
+      border:2px solid rgba(1,83,79,.15);
+      border-top-color:var(--green);
+      border-radius:50%;
+      animation:spin .8s linear infinite;
+      flex-shrink:0;
+    }
+
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    .filters{
+      background:rgba(255,255,255,.85);
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:14px;
+      margin-bottom:16px;
+      box-shadow:0 8px 24px rgba(10,20,15,.04);
+      backdrop-filter:blur(8px);
+    }
+
+    .filters-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+      flex-wrap:wrap;
+    }
+
+    .filters-title{
+      font-size:12px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      font-weight:800;
+    }
+
+    .filters-grid{
+      display:grid;
+      grid-template-columns:1.3fr 1fr 1fr auto;
+      gap:10px;
+      align-items:end;
+    }
+
+    .field label{
+      display:block;
+      font-size:11px;
+      font-weight:700;
+      color:var(--muted);
+      margin-bottom:6px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+
+    .field input, .field select{
+      width:100%;
+      height:42px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      padding:0 12px;
+      font-size:13px;
+      color:var(--ink);
+      outline:none;
+      transition:.18s ease;
+    }
+
+    .field input:focus, .field select:focus{
+      border-color:rgba(1,83,79,.4);
+      box-shadow:0 0 0 4px rgba(1,83,79,.08);
+    }
+
+    .filters-actions{
+      display:flex;
+      gap:8px;
+      align-items:end;
+    }
+
+    .filter-summary{
+      margin-top:10px;
+      font-size:12px;
+      color:var(--faint);
+    }
+
+    .kpi-grid{
+      display:grid;
+      grid-template-columns:repeat(6, minmax(0,1fr));
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    .kpi{
+      background:linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(251,251,249,1) 100%);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+      box-shadow:0 6px 18px rgba(10,20,15,.03);
+      min-width:0;
+    }
+
+    .kpi-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:12px;
+    }
+
+    .kpi-label{
+      font-size:11px;
+      color:var(--muted);
+      text-transform:uppercase;
+      font-weight:700;
+      letter-spacing:.05em;
+    }
+
+    .kpi-icon{
+      width:28px;
+      height:28px;
+      border-radius:10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:13px;
+    }
+
+    .kpi-value{
+      font-size:30px;
+      line-height:1;
+      font-weight:800;
+      letter-spacing:-.03em;
+      margin-bottom:6px;
+    }
+
+    .kpi-sub{
+      font-size:12px;
+      color:var(--faint);
+      min-height:18px;
+    }
+
+    .kpi-bar{
+      margin-top:12px;
+      height:6px;
+      background:#eceee8;
+      border-radius:999px;
+      overflow:hidden;
+    }
+
+    .kpi-bar-fill{
+      height:100%;
+      border-radius:999px;
+      transition:width .45s ease;
+    }
+
+    .card{
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:18px;
+      box-shadow:0 8px 26px rgba(10,20,15,.04);
+    }
+
+    .card-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+
+    .card h3{
+      margin:0;
+      font-size:12px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+
+    .card-note{
+      font-size:11px;
+      color:var(--faint);
+    }
+
+    .tabs-wrap{
+      background:rgba(255,255,255,.75);
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:8px;
+      margin-bottom:16px;
+      backdrop-filter:blur(8px);
+      position:sticky;
+      top:8px;
+      z-index:20;
+      box-shadow:0 8px 24px rgba(10,20,15,.04);
+    }
+
+    .tabs{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .tab{
+      border:none;
+      border-radius:12px;
+      background:transparent;
+      color:var(--muted);
+      padding:10px 14px;
+      font-size:13px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+
+    .tab:hover{background:#f1f3ee;color:var(--ink)}
+    .tab.active{background:var(--green);color:#fff;box-shadow:0 6px 18px rgba(1,83,79,.18)}
+
+    .panel{display:none}
+    .panel.active{display:block}
+
+    .grid-2{display:grid;grid-template-columns:1.2fr .8fr;gap:12px;margin-bottom:12px}
+    .grid-2-eq{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+    .grid-5{display:grid;grid-template-columns:repeat(5, 1fr);gap:10px;margin-bottom:12px}
+
+    .fstep{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:10px 0;
+      border-bottom:1px dashed rgba(10,20,15,.08);
+    }
+    .fstep:last-child{border-bottom:none}
+    .fstep-name{width:180px;font-size:12px;color:var(--muted);flex-shrink:0}
+    .fbar-track{flex:1;height:38px;background:#f1f3ef;border-radius:10px;overflow:hidden;position:relative}
+    .fbar-fill{
+      height:100%;
+      min-width:56px;
+      display:flex;
+      align-items:center;
+      padding:0 12px;
+      color:#fff;
+      font-size:12px;
+      font-weight:800;
+      border-radius:10px;
+      transition:width .55s ease;
+      box-shadow:inset 0 -8px 14px rgba(0,0,0,.08);
+    }
+    .fstep-right{width:92px;text-align:right;font-size:12px;color:var(--muted);flex-shrink:0}
+    .drop{color:var(--red);font-weight:800;margin-left:4px}
+
+    .brow{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+    .blabel{
+      width:150px;
+      min-width:150px;
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .btrack{flex:1;height:10px;background:#eef1eb;border-radius:999px;overflow:hidden}
+    .bfill{height:100%;border-radius:999px;transition:width .45s ease}
+    .bval{min-width:44px;text-align:right;font-size:11px;font-weight:700;color:var(--muted)}
+
+    .layer-card{
+      border-radius:18px;
+      padding:16px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.95) 0%, rgba(250,251,249,.98) 100%);
+      min-width:0;
+    }
+
+    .layer-name{font-size:12px;font-weight:800;margin-bottom:4px}
+    .layer-range{font-size:11px;color:var(--faint);margin-bottom:12px}
+    .layer-value{font-size:28px;font-weight:800;line-height:1;letter-spacing:-.03em;margin-bottom:8px}
+    .layer-meta{font-size:12px;color:var(--muted)}
+    .pill{
+      display:inline-block;
+      margin-top:10px;
+      padding:5px 9px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:800;
+    }
+
+    .progress-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+    .progress-label{
+      width:150px;
+      min-width:150px;
+      font-size:12px;
+      color:var(--muted);
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .progress-track{
+      flex:1;
+      height:20px;
+      background:#eef1eb;
+      border-radius:999px;
+      overflow:hidden;
+      position:relative;
+    }
+    .progress-fill{height:100%;border-radius:999px;transition:width .45s ease}
+    .progress-text{
+      position:absolute;
+      left:10px;
+      top:50%;
+      transform:translateY(-50%);
+      font-size:10px;
+      font-weight:800;
+      pointer-events:none;
+    }
+    .progress-meta{min-width:52px;text-align:right;font-size:11px;color:var(--muted);font-weight:700}
+
+    .insight{
+      margin-top:14px;
+      background:linear-gradient(180deg, var(--green-soft) 0%, var(--green-soft-2) 100%);
+      border:1px solid rgba(1,83,79,.1);
+      border-left:4px solid var(--green);
+      border-radius:14px;
+      padding:14px 15px;
+    }
+    .insight-title{
+      font-size:10px;
+      font-weight:800;
+      color:var(--green);
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      margin-bottom:4px;
+    }
+    .insight-text{font-size:12px;color:#0b655e;line-height:1.5}
+
+    .chart-wrap{position:relative;width:100%}
+
+    .empty-state{
+      display:none;
+      background:var(--surface);
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:38px 24px;
+      text-align:center;
+      box-shadow:0 8px 26px rgba(10,20,15,.04);
+    }
+
+    .empty-state-icon{font-size:32px;margin-bottom:10px}
+    .empty-state h3{margin:0 0 8px;font-size:18px}
+    .empty-state p{margin:0;color:var(--muted);font-size:13px}
+    .footer-note{margin-top:18px;font-size:11px;color:var(--faint);text-align:right}
+
+    @media (max-width:1100px){
+      .filters-grid{grid-template-columns:1fr 1fr}
+      .kpi-grid{grid-template-columns:repeat(3, minmax(0,1fr))}
+      .grid-5{grid-template-columns:repeat(3,1fr)}
+    }
+
+    @media (max-width:780px){
+      .shell{padding:18px 12px 40px}
+      .hero{padding:18px}
+      .brand{align-items:flex-start;gap:12px}
+      .brand-copy h1{font-size:19px}
+      .brand-logo-img{height:28px}
+      .kpi-grid{grid-template-columns:repeat(2, minmax(0,1fr))}
+      .grid-2,.grid-2-eq{grid-template-columns:1fr}
+      .grid-5{grid-template-columns:repeat(2,1fr)}
+      .fstep{align-items:flex-start;flex-direction:column}
+      .fstep-name,.fstep-right,.blabel,.progress-label{width:auto;min-width:0}
+      .filters-grid{grid-template-columns:1fr}
+      .filters-actions{width:100%}
+      .filters-actions .btn{flex:1}
+    }
+
+    @media (max-width:520px){
+      .kpi-grid{grid-template-columns:1fr}
+      .grid-5{grid-template-columns:1fr}
+      .hero-actions{width:100%}
+      .status-chip,.btn-primary{width:100%;justify-content:center}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero" aria-label="Cabecera del dashboard">
+      <div class="hero-top">
+        <div class="brand">
+          <div class="brand-logo-wrap">
+            <img src="01.%20Logo%20(1).png" alt="SnailStep" class="brand-logo-img">
+          </div>
+          <div class="brand-copy">
+            <h1>Dashboard de Campaña</h1>
+            <p>Seguimiento en vivo conectado a Google Sheets · Semana Europea de la Movilidad</p>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <div class="status-chip">
+            <span class="live-dot" aria-hidden="true"></span>
+            <span id="sync-time" aria-live="polite">Cargando datos...</span>
+          </div>
+          <button class="btn btn-primary" id="sync-btn" type="button">↻ Actualizar</button>
+        </div>
+      </div>
+
+      <div class="config">
+        <strong>Fuente de datos:</strong> Google Sheets · Documento
+        <code>1awKfnzTY6ZfELZGs1QlD-WlmeW3apBOf</code> · Pestaña
+        <code>Externos</code> · Actualización automática cada 5 minutos.
+      </div>
+    </section>
+
+    <div id="loading-bar" class="bar loading" aria-live="polite">
+      <div class="spinner" aria-hidden="true"></div>
+      Leyendo datos de Google Sheets...
+    </div>
+
+    <div id="error-bar" class="bar error" aria-live="assertive"></div>
+    <div id="empty-bar" class="bar empty" aria-live="polite"></div>
+
+    <section class="filters" id="filters-wrap" style="display:none;">
+      <div class="filters-head">
+        <div class="filters-title">Filtros operativos</div>
+      </div>
+
+      <div class="filters-grid">
+        <div class="field">
+          <label for="search-input">Buscar</label>
+          <input id="search-input" type="text" placeholder="Municipio, contacto, email o notas" />
+        </div>
+
+        <div class="field">
+          <label for="estado-filter">Estado</label>
+          <select id="estado-filter">
+            <option value="all">Todos</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="ccaa-filter">CCAA</label>
+          <select id="ccaa-filter">
+            <option value="all">Todas</option>
+          </select>
+        </div>
+
+        <div class="filters-actions">
+          <button class="btn btn-secondary" id="clear-filters-btn" type="button">Limpiar</button>
+        </div>
+      </div>
+
+      <div class="filter-summary" id="filter-summary">Sin filtros activos.</div>
+    </section>
+
+    <main id="main" style="display:none;">
+      <section class="kpi-grid" id="kpis" aria-label="Indicadores principales"></section>
+
+      <div class="tabs-wrap">
+        <div class="tabs" role="tablist" aria-label="Secciones del dashboard">
+          <button class="tab active" data-tab="funnel" role="tab" aria-selected="true" type="button">Funnel</button>
+          <button class="tab" data-tab="capas" role="tab" aria-selected="false" type="button">Capas · Población</button>
+          <button class="tab" data-tab="ccaa" role="tab" aria-selected="false" type="button">CCAAs</button>
+          <button class="tab" data-tab="global" role="tab" aria-selected="false" type="button">Pipeline global</button>
+        </div>
+      </div>
+
+      <section id="panel-funnel" class="panel active" aria-label="Panel funnel">
+        <div class="card">
+          <div class="card-head">
+            <h3>Funnel de conversión</h3>
+            <div class="card-note">Del pipeline filtrado al avance comercial</div>
+          </div>
+          <div id="funnel-steps"></div>
+        </div>
+
+        <div class="grid-2" style="margin-top:12px;">
+          <div class="card">
+            <div class="card-head">
+              <h3>Activación por capa de municipio</h3>
+              <div class="card-note">% enviado o superior sobre total</div>
+            </div>
+            <div id="conv-capa"></div>
+            <div class="insight">
+              <div class="insight-title">Insight</div>
+              <div class="insight-text" id="insight-capa">Calculando...</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>Velocidad de registro por fecha</h3>
+              <div class="card-note">Actividad temporal</div>
+            </div>
+            <div class="chart-wrap" style="height:240px;">
+              <canvas id="chartVel" role="img" aria-label="Registros por fecha"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="panel-capas" class="panel" aria-label="Panel capas">
+        <div class="grid-5" id="layer-cards"></div>
+
+        <div class="grid-2-eq">
+          <div class="card">
+            <div class="card-head">
+              <h3>Penetración por capa (%)</h3>
+              <div class="card-note">Nivel de activación relativo</div>
+            </div>
+            <div class="chart-wrap" style="height:260px;">
+              <canvas id="chartCapaPen" role="img" aria-label="Penetración por capa"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>Activos vs pendientes</h3>
+              <div class="card-note">Distribución por tamaño de municipio</div>
+            </div>
+            <div class="chart-wrap" style="height:260px;">
+              <canvas id="chartCapaStack" role="img" aria-label="Estados por capa"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="panel-ccaa" class="panel" aria-label="Panel CCAA">
+        <div class="grid-2-eq">
+          <div class="card">
+            <div class="card-head">
+              <h3>Contactos por CCAA</h3>
+              <div class="card-note">Volumen y activación</div>
+            </div>
+            <div class="chart-wrap" style="height:320px;">
+              <canvas id="chartCCAA" role="img" aria-label="Contactos por comunidad autónoma"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>Tasa de activación por CCAA</h3>
+              <div class="card-note">% enviado o superior</div>
+            </div>
+            <div id="ccaa-tasa"></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head">
+            <h3>Progreso detallado</h3>
+            <div class="card-note">Ratio de avance por territorio</div>
+          </div>
+          <div id="ccaa-progress"></div>
+        </div>
+      </section>
+
+      <section id="panel-global" class="panel" aria-label="Panel global">
+        <div class="grid-2-eq">
+          <div class="card">
+            <div class="card-head">
+              <h3>Top países · Pipeline internacional</h3>
+              <div class="card-note">Excluye España</div>
+            </div>
+            <div class="chart-wrap" style="height:340px;">
+              <canvas id="chartPaises" role="img" aria-label="Contactos por país"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>España vs mundo</h3>
+              <div class="card-note">Distribución del pipeline</div>
+            </div>
+            <div class="chart-wrap" style="height:220px;">
+              <canvas id="chartDonut" role="img" aria-label="España frente a internacional"></canvas>
+            </div>
+            <div class="insight" id="insight-global">
+              <div class="insight-title">Oportunidad</div>
+              <div class="insight-text">Calculando...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="footer-note">Dashboard HTML standalone · SnailStep</div>
+    </main>
+
+    <section id="empty-state" class="empty-state" aria-live="polite">
+      <div class="empty-state-icon">📭</div>
+      <h3>No hay datos suficientes para mostrar el dashboard</h3>
+      <p>Revisa que la hoja tenga registros válidos y que las columnas principales estén bien nombradas.</p>
+    </section>
+  </div>
+
+  <script>
+    const SHEET_ID = '1awKfnzTY6ZfELZGs1QlD-WlmeW3apBOf';
+    const GID = '2016444956';
+    const REFRESH_MS = 5 * 60 * 1000;
+
+    const CAPAS = ['Metrópoli','Gran ciudad','Ciudad media','Municipio','Pequeño municipio'];
+
+    const CCOLORS = {
+      'Metrópoli':'#534AB7',
+      'Gran ciudad':'#185FA5',
+      'Ciudad media':'#1D9E75',
+      'Municipio':'#BA7517',
+      'Pequeño municipio':'#A32D2D'
+    };
+
+    const L_RANGES = {
+      'Metrópoli':'+500k',
+      'Gran ciudad':'100–500k',
+      'Ciudad media':'50–100k',
+      'Municipio':'10–50k',
+      'Pequeño municipio':'<10k'
+    };
+
+    const CCAA_MAP = {
+      'Madrid':'Comunidad de Madrid',
+      'Barcelona':'Cataluña',
+      'Valencia':'Comunidad Valenciana',
+      'València':'Comunidad Valenciana',
+      'Sevilla':'Andalucía',
+      'Zaragoza':'Aragón',
+      'Málaga':'Andalucía',
+      'Murcia':'Región de Murcia',
+      'Palma':'Illes Balears',
+      'Bilbao':'País Vasco',
+      'Alicante':'Comunidad Valenciana',
+      'Córdoba':'Andalucía',
+      'Valladolid':'Castilla y León',
+      'Vigo':'Galicia',
+      'Vitoria-Gasteiz':'País Vasco',
+      'A Coruña':'Galicia',
+      'Terrassa':'Cataluña',
+      'Badalona':'Cataluña',
+      'Cartagena':'Región de Murcia',
+      'Santa Cruz de Tenerife':'Canarias',
+      'Almería':'Andalucía',
+      'Alcalá de Henares':'Comunidad de Madrid',
+      'Burgos':'Castilla y León',
+      'Albacete':'Castilla-La Mancha',
+      'Santander':'Cantabria',
+      'Tarragona':'Cataluña',
+      'Cádiz':'Andalucía',
+      'Santa Coloma de Gramenet':'Cataluña',
+      'Torrevieja':'Comunidad Valenciana',
+      'Santiago de Compostela':'Galicia',
+      'Avilés':'Asturias',
+      'Valdemoro':'Comunidad de Madrid',
+      'Vilanova i la Geltrú':'Cataluña',
+      'Viladecans':'Cataluña',
+      'Benidorm':'Comunidad Valenciana',
+      'Calvià':'Illes Balears',
+      'Alzira':'Comunidad Valenciana',
+      'Tres Cantos':'Comunidad de Madrid',
+      'Alcantarilla':'Región de Murcia',
+      'Basauri':'País Vasco',
+      'Sestao':'País Vasco',
+      'Vilafranca del Penedès':'Cataluña',
+      'Barberà del Vallès':'Cataluña',
+      'Villena':'Comunidad Valenciana',
+      'Almendralejo':'Extremadura',
+      'Barañáin':'Navarra',
+      'Santiponce':'Andalucía',
+      'Calp':'Comunidad Valenciana',
+      'Adra':'Andalucía',
+      'Alboraya':'Comunidad Valenciana',
+      'Valls':'Cataluña',
+      'Vila-seca':'Cataluña',
+      'Abrera':'Cataluña',
+      'Vic':'Cataluña',
+      'Berga':'Cataluña',
+      'Ames':'Galicia',
+      'Carballo':'Galicia',
+      'Sitges':'Cataluña',
+      'Alella':'Cataluña',
+      'Alguaire':'Cataluña',
+      'Almenar':'Cataluña'
+    };
+
+    let charts = {};
+    let isLoading = false;
+    let autoRefreshHandle = null;
+    let normalizedRows = [];
+
+    function escapeHTML(value = '') {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function normalizeText(value = '') {
+      return String(value)
+        .trim()
+        .toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function normalizeHeader(header = '') {
+      return normalizeText(header)
+        .replace(/[^\w\s]/g, ' ')
+        .replace(/\s+/g, '_')
+        .replace(/^_+|_+$/g, '');
+    }
+
+    function parseNumber(value) {
+      const clean = String(value ?? '').replace(/[^\d]/g, '').trim();
+      return clean ? Number(clean) : 0;
+    }
+
+    function isSpain(country) {
+      const c = normalizeText(country);
+      return c === 'spain' || c === 'espana' || c === 'españa';
+    }
+
+    function getCCAA(city) {
+      if (!city) return 'Otras';
+      return CCAA_MAP[String(city).trim()] || 'Otras';
+    }
+
+    function getCapa(population) {
+      const n = parseNumber(population);
+      if (n >= 500000) return 'Metrópoli';
+      if (n >= 100000) return 'Gran ciudad';
+      if (n >= 50000) return 'Ciudad media';
+      if (n >= 10000) return 'Municipio';
+      return 'Pequeño municipio';
+    }
+
+    function normalizeEstado(value = '') {
+      const e = normalizeText(value);
+
+      if (e.includes('cerrado')) return 'cerrado';
+      if (e.includes('oportun')) return 'oportunidad';
+      if (e.includes('reuni')) return 'reunion';
+      if (e.includes('respond')) return 'respondido';
+      if (e.includes('enviado')) return 'enviado';
+      if (e.includes('pendiente')) return 'pendiente';
+
+      return 'otro';
+    }
+
+    function estadoLabel(estadoNorm) {
+      switch (estadoNorm) {
+        case 'pendiente': return 'Pendiente';
+        case 'enviado': return 'Enviado';
+        case 'respondido': return 'Respondido';
+        case 'reunion': return 'Reunión';
+        case 'oportunidad': return 'Oportunidad';
+        case 'cerrado': return 'Cerrado';
+        default: return 'Otro';
+      }
+    }
+
+    function isActivo(estado = '') {
+      const n = normalizeEstado(estado);
+      return ['enviado','respondido','reunion','oportunidad','cerrado'].includes(n);
+    }
+
+    function parseDateSmart(value = '') {
+      const raw = String(value).trim();
+      if (!raw) return null;
+
+      if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+        return new Date(raw + 'T00:00:00');
+      }
+
+      const dmY = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (dmY) {
+        const [, d, m, y] = dmY;
+        return new Date(`${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}T00:00:00`);
+      }
+
+      const dmyDash = raw.match(/^(\d{1,2})-(\d{1,2})-(\d{4})$/);
+      if (dmyDash) {
+        const [, d, m, y] = dmyDash;
+        return new Date(`${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}T00:00:00`);
+      }
+
+      const fallback = new Date(raw);
+      return Number.isNaN(fallback.getTime()) ? null : fallback;
+    }
+
+    function formatDateKey(date) {
+      if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function formatDateShort(dateKey) {
+      const date = parseDateSmart(dateKey);
+      if (!date) return dateKey;
+      return date.toLocaleDateString('es-ES', { day:'2-digit', month:'2-digit' });
+    }
+
+    function pick(obj, keys) {
+      for (const key of keys) {
+        if (obj[key] && String(obj[key]).trim()) return String(obj[key]).trim();
+      }
+      return '';
+    }
+
+    function parseCSV(text) {
+      const rows = [];
+      let row = [];
+      let cell = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        const next = text[i + 1];
+
+        if (char === '"') {
+          if (inQuotes && next === '"') {
+            cell += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          row.push(cell);
+          cell = '';
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+          if (char === '\r' && next === '\n') i++;
+          row.push(cell);
+          rows.push(row);
+          row = [];
+          cell = '';
+        } else {
+          cell += char;
+        }
+      }
+
+      if (cell.length || row.length) {
+        row.push(cell);
+        rows.push(row);
+      }
+
+      return rows;
+    }
+
+    function destroyCharts() {
+      Object.values(charts).forEach(chart => {
+        if (chart && typeof chart.destroy === 'function') chart.destroy();
+      });
+      charts = {};
+    }
+
+    function showBar(id, message = '') {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (message) el.innerHTML = message;
+      el.style.display = 'block';
+    }
+
+    function hideBar(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.display = 'none';
+      el.innerHTML = '';
+    }
+
+    function showEmptyState(show) {
+      document.getElementById('empty-state').style.display = show ? 'block' : 'none';
+      document.getElementById('main').style.display = show ? 'none' : 'block';
+      document.getElementById('filters-wrap').style.display = show ? 'none' : 'block';
+    }
+
+    function brow(label, value, max, color, suffix = '') {
+      const safeLabel = escapeHTML(label);
+      const p = max > 0 ? Math.round((value / max) * 100) : 0;
+      return `
+        <div class="brow">
+          <div class="blabel" title="${safeLabel}">${safeLabel}</div>
+          <div class="btrack"><div class="bfill" style="width:${p}%;background:${color};"></div></div>
+          <div class="bval">${value}${suffix}</div>
+        </div>
+      `;
+    }
+
+    function showTab(id) {
+      document.querySelectorAll('.tab').forEach(tab => {
+        const active = tab.dataset.tab === id;
+        tab.classList.toggle('active', active);
+        tab.setAttribute('aria-selected', String(active));
+      });
+
+      document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+      const target = document.getElementById(`panel-${id}`);
+      if (target) target.classList.add('active');
+    }
+
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => showTab(tab.dataset.tab));
+    });
+
+    function normalizeRows(rows) {
+      return rows.map(row => {
+        const fechaObj = parseDateSmart(row.fecha || '');
+        const estadoNorm = normalizeEstado(row.estado || '');
+
+        return {
+          pais: String(row.pais || '').trim(),
+          ciudad: String(row.ciudad || '').trim(),
+          poblacion: parseNumber(row.poblacion),
+          contacto: String(row.contacto || '').trim(),
+          email: String(row.email || '').trim(),
+          telefono: String(row.telefono || '').trim(),
+          estado: String(row.estado || '').trim(),
+          estadoNorm,
+          fecha: String(row.fecha || '').trim(),
+          fechaObj,
+          fechaKey: fechaObj ? formatDateKey(fechaObj) : '',
+          resultado: String(row.resultado || '').trim(),
+          notas: String(row.notas || '').trim(),
+          ccaa: getCCAA(row.ciudad || ''),
+          capa: getCapa(row.poblacion),
+          activo: isActivo(row.estado || '')
+        };
+      });
+    }
+
+    function populateFilters(rows) {
+      const estadoSelect = document.getElementById('estado-filter');
+      const ccaaSelect = document.getElementById('ccaa-filter');
+
+      const estados = [...new Set(rows.map(r => r.estadoNorm).filter(Boolean))]
+        .sort((a,b) => a.localeCompare(b, 'es'));
+
+      const ccaas = [...new Set(rows.filter(r => isSpain(r.pais)).map(r => r.ccaa || 'Otras').filter(Boolean))]
+        .sort((a,b) => a.localeCompare(b, 'es'));
+
+      estadoSelect.innerHTML = '<option value="all">Todos</option>' +
+        estados.map(e => `<option value="${escapeHTML(e)}">${escapeHTML(estadoLabel(e))}</option>`).join('');
+
+      ccaaSelect.innerHTML = '<option value="all">Todas</option>' +
+        ccaas.map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join('');
+    }
+
+    function getFilteredRows() {
+      const search = normalizeText(document.getElementById('search-input').value);
+      const estado = document.getElementById('estado-filter').value;
+      const ccaa = document.getElementById('ccaa-filter').value;
+
+      return normalizedRows.filter(row => {
+        const matchEstado = estado === 'all' || row.estadoNorm === estado;
+        const matchCCAA = ccaa === 'all' || row.ccaa === ccaa;
+        const hayTexto = !search || [row.ciudad, row.contacto, row.email, row.notas, row.resultado]
+          .some(field => normalizeText(field).includes(search));
+
+        return matchEstado && matchCCAA && hayTexto;
+      });
+    }
+
+    function updateFilterSummary(rows) {
+      const search = document.getElementById('search-input').value.trim();
+      const estado = document.getElementById('estado-filter').value;
+      const ccaa = document.getElementById('ccaa-filter').value;
+
+      const active = [];
+      if (search) active.push(`búsqueda: "${search}"`);
+      if (estado !== 'all') active.push(`estado: ${estadoLabel(estado)}`);
+      if (ccaa !== 'all') active.push(`CCAA: ${ccaa}`);
+
+      document.getElementById('filter-summary').textContent = active.length
+        ? `${rows.length} registros tras filtros activos · ${active.join(' · ')}`
+        : `${rows.length} registros · sin filtros activos`;
+    }
+
+    function renderKPIs(data) {
+      const items = [
+        {
+          label:'Total España',
+          value:data.totalSpain.toLocaleString('es-ES'),
+          sub:'contactos en CRM',
+          color:'var(--ink)',
+          bar:100,
+          barColor:'#cfd5ce',
+          icon:'🇪🇸',
+          iconBg:'background:#f2f4ef;color:#5d655e;'
+        },
+        {
+          label:'Enviados',
+          value:data.enviados.toLocaleString('es-ES'),
+          sub:'contactos activados',
+          color:'var(--green)',
+          bar:data.totalSpain > 0 ? Math.round((data.enviados / data.totalSpain) * 100) : 0,
+          barColor:'var(--green)',
+          icon:'✉️',
+          iconBg:'background:var(--green-soft);color:var(--green);'
+        },
+        {
+          label:'Respondidos',
+          value:data.respondidos.toLocaleString('es-ES'),
+          sub:'contactos con respuesta',
+          color:'var(--blue)',
+          bar:data.totalSpain > 0 ? Math.round((data.respondidos / data.totalSpain) * 100) : 0,
+          barColor:'var(--blue)',
+          icon:'💬',
+          iconBg:'background:var(--blue-soft);color:var(--blue);'
+        },
+        {
+          label:'Reuniones',
+          value:data.reuniones.toLocaleString('es-ES'),
+          sub:'contactos cualificados',
+          color:'var(--purple)',
+          bar:data.totalSpain > 0 ? Math.round((data.reuniones / data.totalSpain) * 100) : 0,
+          barColor:'var(--purple)',
+          icon:'📅',
+          iconBg:'background:var(--purple-soft);color:var(--purple);'
+        },
+        {
+          label:'Pendientes',
+          value:data.pendientes.toLocaleString('es-ES'),
+          sub:'por activar',
+          color:'var(--amber)',
+          bar:data.totalSpain > 0 ? Math.round((data.pendientes / data.totalSpain) * 100) : 0,
+          barColor:'var(--amber)',
+          icon:'⏳',
+          iconBg:'background:var(--amber-soft);color:var(--amber);'
+        },
+        {
+          label:'Pipeline global',
+          value:data.totalGlobal.toLocaleString('es-ES'),
+          sub:`en ${data.countryCount} países`,
+          color:'var(--ink)',
+          bar:null,
+          barColor:'#cfd5ce',
+          icon:'🌍',
+          iconBg:'background:#f2f4ef;color:#5d655e;'
+        }
+      ];
+
+      document.getElementById('kpis').innerHTML = items.map(item => `
+        <div class="kpi">
+          <div class="kpi-head">
+            <div class="kpi-label">${escapeHTML(item.label)}</div>
+            <div class="kpi-icon" style="${item.iconBg}">${item.icon}</div>
+          </div>
+          <div class="kpi-value" style="color:${item.color};">${escapeHTML(item.value)}</div>
+          <div class="kpi-sub">${escapeHTML(item.sub)}</div>
+          ${item.bar !== null ? `
+            <div class="kpi-bar">
+              <div class="kpi-bar-fill" style="width:${item.bar}%;background:${item.barColor};"></div>
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+
+    function renderFunnel(data) {
+      const steps = [
+        { name:'Pipeline filtrado', value:data.totalGlobal, color:'#D4D7D1' },
+        { name:'España', value:data.totalSpain, color:'#1D9E75' },
+        { name:'Enviados', value:data.enviados, color:'#01534f' },
+        { name:'Respondidos', value:data.respondidos, color:'#185FA5' },
+        { name:'Reuniones', value:data.reuniones, color:'#534AB7' },
+        { name:'Oportunidades', value:data.oportunidades, color:'#B97418' }
+      ];
+
+      const base = steps[0].value || 1;
+
+      document.getElementById('funnel-steps').innerHTML = steps.map((step, index) => {
+        const prev = index > 0 ? steps[index - 1].value : 0;
+        const pct = Math.round((step.value / base) * 100);
+        const drop = index > 0 && prev > 0 ? Math.round(((prev - step.value) / prev) * 100) : 0;
+
+        return `
+          <div class="fstep">
+            <div class="fstep-name">${escapeHTML(step.name)}</div>
+            <div class="fbar-track">
+              <div class="fbar-fill" style="width:${pct}%;background:${step.color};">${step.value.toLocaleString('es-ES')}</div>
+            </div>
+            <div class="fstep-right">${pct}%${index > 0 && drop > 0 ? `<span class="drop">↓${drop}%</span>` : ''}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderConvCapa(capaStats) {
+      document.getElementById('conv-capa').innerHTML = CAPAS.map(capa => {
+        const d = capaStats[capa] || { total:0, env:0 };
+        const pct = d.total > 0 ? Math.round((d.env / d.total) * 100) : 0;
+        return brow(capa, pct, 100, CCOLORS[capa], '%');
+      }).join('');
+    }
+
+    function renderInsightCapa(capaStats) {
+      let best = null;
+      let worst = null;
+      let bestPct = -1;
+      let worstPct = Infinity;
+
+      CAPAS.forEach(capa => {
+        const d = capaStats[capa] || { total:0, env:0 };
+        if (d.total <= 0) return;
+        const pct = d.env / d.total;
+        if (pct > bestPct) { bestPct = pct; best = capa; }
+        if (d.total > 5 && pct < worstPct) { worstPct = pct; worst = capa; }
+      });
+
+      const worstPending = worst ? ((capaStats[worst]?.total || 0) - (capaStats[worst]?.env || 0)) : 0;
+
+      document.getElementById('insight-capa').innerHTML = best
+        ? `<strong>${escapeHTML(best)}</strong> presenta la mejor tasa de activación. ${worst ? `La mayor oportunidad está en <strong>${escapeHTML(worst)}</strong>, con <strong>${worstPending}</strong> contactos pendientes.` : ''}`
+        : 'Todavía no hay suficientes datos para identificar patrones claros por capa.';
+    }
+
+    function renderChartVel(dates) {
+      charts.vel = new Chart(document.getElementById('chartVel'), {
+        type:'bar',
+        data:{
+          labels:dates.map(d => formatDateShort(d[0])),
+          datasets:[{
+            label:'Registros',
+            data:dates.map(d => d[1]),
+            backgroundColor:'#01534f',
+            borderRadius:8,
+            maxBarThickness:34
+          }]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          plugins:{ legend:{ display:false } },
+          scales:{
+            x:{ grid:{ display:false }, ticks:{ color:'#6b6b68', font:{ size:11 } } },
+            y:{ beginAtZero:true, grid:{ color:'rgba(0,0,0,.05)' }, ticks:{ color:'#6b6b68', font:{ size:11 }, precision:0 } }
+          }
+        }
+      });
+    }
+
+    function renderLayerCards(capaStats) {
+      document.getElementById('layer-cards').innerHTML = CAPAS.map(capa => {
+        const d = capaStats[capa] || { total:0, env:0 };
+        const pct = d.total > 0 ? Math.round((d.env / d.total) * 100) : 0;
+
+        let pillBg = '#FDEEEE';
+        let pillColor = '#A32D2D';
+        if (pct >= 80) { pillBg = '#E6F6F1'; pillColor = '#01534f'; }
+        else if (pct >= 40) { pillBg = '#FFF1DE'; pillColor = '#9a6210'; }
+
+        return `
+          <div class="layer-card">
+            <div class="layer-name" style="color:${CCOLORS[capa]};">${escapeHTML(capa)}</div>
+            <div class="layer-range">${escapeHTML(L_RANGES[capa])} hab.</div>
+            <div class="layer-value" style="color:${CCOLORS[capa]};">${d.total.toLocaleString('es-ES')}</div>
+            <div class="layer-meta">${d.env} activos · ${d.total - d.env} pendientes</div>
+            <div class="pill" style="background:${pillBg};color:${pillColor};">${pct}% activo</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderChartCapaPen(capaStats) {
+      charts.capaPen = new Chart(document.getElementById('chartCapaPen'), {
+        type:'bar',
+        data:{
+          labels:CAPAS,
+          datasets:[{
+            label:'% activado',
+            data:CAPAS.map(c => {
+              const d = capaStats[c] || { total:0, env:0 };
+              return d.total > 0 ? Math.round((d.env / d.total) * 100) : 0;
+            }),
+            backgroundColor:CAPAS.map(c => CCOLORS[c]),
+            borderRadius:8
+          }]
+        },
+        options:{
+          responsive:true,
           maintainAspectRatio:false,
           plugins:{ legend:{ display:false } },
           scales:{
@@ -16,7 +1431,7 @@
           labels:CAPAS,
           datasets:[
             {
-              label:'Enviados',
+              label:'Activos',
               data:CAPAS.map(c => (capaStats[c] || { env:0 }).env),
               backgroundColor:CAPAS.map(c => CCOLORS[c]),
               borderRadius:8
@@ -35,9 +1450,7 @@
         options:{
           responsive:true,
           maintainAspectRatio:false,
-          plugins:{
-            legend:{ position:'bottom', labels:{ boxWidth:12, color:'#6b6b68', font:{ size:11 } } }
-          },
+          plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12, color:'#6b6b68', font:{ size:11 } } } },
           scales:{
             x:{ stacked:true, grid:{ display:false }, ticks:{ color:'#6b6b68', font:{ size:11 } } },
             y:{ stacked:true, grid:{ color:'rgba(0,0,0,.05)' }, ticks:{ color:'#6b6b68', font:{ size:11 }, precision:0 } }
@@ -53,7 +1466,7 @@
           labels:ccaaArr.map(([name]) => name),
           datasets:[
             {
-              label:'Enviados',
+              label:'Activos',
               data:ccaaArr.map(([,d]) => d.env),
               backgroundColor:'#01534f',
               borderRadius:8
@@ -70,9 +1483,7 @@
           indexAxis:'y',
           responsive:true,
           maintainAspectRatio:false,
-          plugins:{
-            legend:{ position:'bottom', labels:{ boxWidth:12, color:'#6b6b68', font:{ size:11 } } }
-          },
+          plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12, color:'#6b6b68', font:{ size:11 } } } },
           scales:{
             x:{ stacked:true, grid:{ color:'rgba(0,0,0,.05)' }, ticks:{ color:'#6b6b68', font:{ size:11 }, precision:0 } },
             y:{ stacked:true, grid:{ display:false }, ticks:{ color:'#6b6b68', font:{ size:11 } } }
@@ -113,7 +1524,7 @@
       }).join('');
     }
 
-    function renderGlobal(countryMap, envSpainCount, pendingSpainCount, totalGlobal, totalSpain) {
+    function renderGlobal(countryMap, activosSpain, pendientesSpain, totalGlobal, totalSpain) {
       const topCountries = Object.entries(countryMap)
         .filter(([country]) => !isSpain(country))
         .sort((a, b) => b[1].total - a[1].total)
@@ -123,4 +1534,264 @@
         type:'bar',
         data:{
           labels:topCountries.map(([country]) => country),
- 
+          datasets:[{
+            label:'Contactos',
+            data:topCountries.map(([,d]) => d.total),
+            backgroundColor:'#7f847d',
+            borderRadius:8
+          }]
+        },
+        options:{
+          indexAxis:'y',
+          responsive:true,
+          maintainAspectRatio:false,
+          plugins:{ legend:{ display:false } },
+          scales:{
+            x:{ grid:{ color:'rgba(0,0,0,.05)' }, ticks:{ color:'#6b6b68', font:{ size:11 }, precision:0 } },
+            y:{ grid:{ display:false }, ticks:{ color:'#6b6b68', font:{ size:11 } } }
+          }
+        }
+      });
+
+      const intlPending = Math.max(totalGlobal - totalSpain, 0);
+
+      charts.donut = new Chart(document.getElementById('chartDonut'), {
+        type:'doughnut',
+        data:{
+          labels:['España activa', 'España pendiente', 'Internacional'],
+          datasets:[{
+            data:[activosSpain, pendientesSpain, intlPending],
+            backgroundColor:['#01534f','#9dddc7','#E6EAE3'],
+            borderWidth:0,
+            hoverOffset:6
+          }]
+        },
+        options:{
+          responsive:true,
+          maintainAspectRatio:false,
+          cutout:'68%',
+          plugins:{ legend:{ position:'bottom', labels:{ boxWidth:12, color:'#6b6b68', font:{ size:11 } } } }
+        }
+      });
+
+      const countriesExSpain = Object.keys(countryMap).filter(country => !isSpain(country)).length;
+
+      document.getElementById('insight-global').innerHTML = `
+        <div class="insight-title">Oportunidad de expansión</div>
+        <div class="insight-text">
+          Existen <strong>${intlPending}</strong> contactos internacionales en
+          <strong>${countriesExSpain}</strong> países listos para una fase de activación posterior.
+        </div>
+      `;
+    }
+
+    function renderDashboard(rows) {
+      destroyCharts();
+
+      const spainRows = rows.filter(r => isSpain(r.pais));
+
+      if (!rows.length) {
+        showEmptyState(true);
+        showBar('empty-bar', '⚠️ Los filtros actuales no devuelven resultados.');
+        return;
+      }
+
+      showEmptyState(false);
+      hideBar('empty-bar');
+
+      const totalSpain = spainRows.length;
+      const totalGlobal = rows.length;
+
+      const pendientes = spainRows.filter(r => r.estadoNorm === 'pendiente').length;
+      const enviados = spainRows.filter(r => r.estadoNorm === 'enviado').length;
+      const respondidos = spainRows.filter(r => r.estadoNorm === 'respondido').length;
+      const reuniones = spainRows.filter(r => r.estadoNorm === 'reunion').length;
+      const oportunidades = spainRows.filter(r => r.estadoNorm === 'oportunidad').length;
+      const cerrados = spainRows.filter(r => r.estadoNorm === 'cerrado').length;
+
+      const activos = spainRows.filter(r => r.activo);
+      const populationReached = activos.reduce((sum, r) => sum + r.poblacion, 0);
+      const activatedCCAAs = new Set(activos.map(r => r.ccaa).filter(Boolean)).size;
+
+      const countryMap = {};
+      rows.forEach(r => {
+        const key = r.pais || 'Desconocido';
+        if (!countryMap[key]) countryMap[key] = { total:0, env:0 };
+        countryMap[key].total++;
+        if (r.activo) countryMap[key].env++;
+      });
+
+      const capaStats = {};
+      CAPAS.forEach(c => capaStats[c] = { total:0, env:0 });
+      spainRows.forEach(r => {
+        if (!capaStats[r.capa]) capaStats[r.capa] = { total:0, env:0 };
+        capaStats[r.capa].total++;
+        if (r.activo) capaStats[r.capa].env++;
+      });
+
+      const ccaaStats = {};
+      spainRows.forEach(r => {
+        const ccaa = r.ccaa || 'Otras';
+        if (!ccaaStats[ccaa]) ccaaStats[ccaa] = { total:0, env:0 };
+        ccaaStats[ccaa].total++;
+        if (r.activo) ccaaStats[ccaa].env++;
+      });
+      const ccaaArr = Object.entries(ccaaStats).sort((a, b) => b[1].total - a[1].total);
+
+      const dateMap = {};
+      spainRows.forEach(r => {
+        if (!r.fechaKey) return;
+        dateMap[r.fechaKey] = (dateMap[r.fechaKey] || 0) + 1;
+      });
+      const dates = Object.entries(dateMap).sort((a, b) => a[0].localeCompare(b[0]));
+
+      renderKPIs({
+        totalSpain,
+        totalGlobal,
+        enviados,
+        respondidos,
+        reuniones,
+        pendientes,
+        populationReached,
+        activatedCCAAs,
+        countryCount: Object.keys(countryMap).length
+      });
+
+      renderFunnel({
+        totalGlobal,
+        totalSpain,
+        enviados,
+        respondidos,
+        reuniones,
+        oportunidades
+      });
+
+      renderConvCapa(capaStats);
+      renderInsightCapa(capaStats);
+      renderChartVel(dates);
+      renderLayerCards(capaStats);
+      renderChartCapaPen(capaStats);
+      renderChartCapaStack(capaStats);
+      renderChartCCAA(ccaaArr);
+      renderCCAATasa(ccaaArr);
+      renderCCAAProgress(ccaaArr);
+      renderGlobal(countryMap, activos.length, pendientes, totalGlobal, totalSpain);
+      updateFilterSummary(rows);
+    }
+
+    function applyFiltersAndRender() {
+      const filtered = getFilteredRows();
+      renderDashboard(filtered);
+    }
+
+    async function fetchSheetCSV() {
+      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}&cachebust=${Date.now()}`;
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return await res.text();
+    }
+
+    async function loadData() {
+      if (isLoading) return;
+      isLoading = true;
+
+      const btn = document.getElementById('sync-btn');
+      btn.classList.add('loading');
+      btn.textContent = '↻ Cargando...';
+      document.body.setAttribute('aria-busy', 'true');
+
+      hideBar('error-bar');
+      hideBar('empty-bar');
+      showBar('loading-bar');
+
+      try {
+        const text = await fetchSheetCSV();
+        const parsed = parseCSV(text);
+
+        if (!parsed.length || parsed.length < 2) {
+          showEmptyState(true);
+          hideBar('loading-bar');
+          showBar('empty-bar', '⚠️ La hoja está vacía o no contiene suficientes filas para construir el dashboard.');
+          document.getElementById('sync-time').textContent = 'Sin datos válidos';
+          return;
+        }
+
+        const headers = parsed[0].map(h => normalizeHeader(h));
+
+        const rows = parsed
+          .slice(1)
+          .filter(row => row.some(cell => String(cell || '').trim()))
+          .map(row => {
+            const obj = {};
+            headers.forEach((header, index) => {
+              obj[header] = String(row[index] || '').trim();
+            });
+
+            return {
+              pais: pick(obj, ['spain','pais','país','country']),
+              ciudad: pick(obj, ['ciudad','municipio','city']),
+              poblacion: pick(obj, ['poblacion','población','habitantes','population']),
+              contacto: pick(obj, ['contacto','persona_contacto','responsable','contact']),
+              email: pick(obj, ['email','correo','correo_electronico','mail']),
+              telefono: pick(obj, ['telefono','teléfono','movil','móvil','phone']),
+              estado: pick(obj, ['estado','estado_contacto','status']),
+              fecha: pick(obj, ['fecha','fecha_envio','fecha_de_envio','date']),
+              resultado: pick(obj, ['resultado_de_email','resultado_email','resultado']),
+              notas: pick(obj, ['notas','nota','observaciones','comments'])
+            };
+          });
+
+        if (!rows.length) {
+          showEmptyState(true);
+          hideBar('loading-bar');
+          showBar('empty-bar', '⚠️ No se han encontrado filas útiles en la hoja.');
+          document.getElementById('sync-time').textContent = 'Sin datos';
+          return;
+        }
+
+        normalizedRows = normalizeRows(rows);
+        populateFilters(normalizedRows);
+        applyFiltersAndRender();
+
+        hideBar('loading-bar');
+        document.getElementById('sync-time').textContent =
+          'Actualizado: ' + new Date().toLocaleTimeString('es-ES', {
+            hour:'2-digit',
+            minute:'2-digit',
+            second:'2-digit'
+          });
+
+      } catch (error) {
+        showEmptyState(true);
+        hideBar('loading-bar');
+        showBar(
+          'error-bar',
+          `⚠️ No se pudo conectar con Google Sheets: <strong>${escapeHTML(error.message)}</strong><br><small>Comprueba que el documento sea público: Compartir → Cualquier persona con el enlace → Lector.</small>`
+        );
+        document.getElementById('sync-time').textContent = 'Error de conexión';
+      } finally {
+        btn.classList.remove('loading');
+        btn.textContent = '↻ Actualizar';
+        document.body.removeAttribute('aria-busy');
+        isLoading = false;
+      }
+    }
+
+    document.getElementById('sync-btn').addEventListener('click', loadData);
+    document.getElementById('search-input').addEventListener('input', applyFiltersAndRender);
+    document.getElementById('estado-filter').addEventListener('change', applyFiltersAndRender);
+    document.getElementById('ccaa-filter').addEventListener('change', applyFiltersAndRender);
+
+    document.getElementById('clear-filters-btn').addEventListener('click', () => {
+      document.getElementById('search-input').value = '';
+      document.getElementById('estado-filter').value = 'all';
+      document.getElementById('ccaa-filter').value = 'all';
+      applyFiltersAndRender();
+    });
+
+    loadData();
+    if (autoRefreshHandle) clearInterval(autoRefreshHandle);
+    autoRefreshHandle = setInterval(loadData, REFRESH_MS);
+  </script>
+</body>
+</html>

@@ -1,1064 +1,754 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SnailStep · Dashboard CRM</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    :root{
-      --green:#01534f;
-      --green-soft:#e8f5f1;
-      --blue:#185FA5;
-      --blue-soft:#eaf2fc;
-      --purple:#534AB7;
-      --purple-soft:#f1effd;
-      --amber:#b97418;
-      --amber-soft:#fff2df;
-      --red:#a32d2d;
-      --red-soft:#fdeeee;
-      --ink:#171816;
-      --muted:#686b66;
-      --faint:#969b95;
-      --surface:#ffffff;
-      --line:rgba(10,20,15,.08);
-      --bg:#f5f6f4;
-      --shadow:0 10px 24px rgba(10,20,15,.05);
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SnailStep · CRM Semana de la Movilidad 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Inter,Arial,sans-serif;
-      background:var(--bg);
-      color:var(--ink);
-    }
-
-    .wrap{
-      max-width:1280px;
-      margin:0 auto;
-      padding:22px 18px 40px;
-    }
-
-    .hero{
-      background:linear-gradient(135deg, rgba(1,83,79,.98) 0%, rgba(12,101,94,.96) 60%, rgba(24,95,165,.88) 100%);
-      color:#fff;
-      border-radius:22px;
-      padding:20px;
-      box-shadow:var(--shadow);
-      margin-bottom:18px;
-    }
-
-    .hero-top{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:16px;
-      flex-wrap:wrap;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .brand img{
-      height:34px;
-      width:auto;
-      display:block;
-      filter:brightness(0) invert(1);
-    }
-
-    .brand h1{
-      margin:0;
-      font-size:22px;
-      line-height:1.1;
-    }
-
-    .brand p{
-      margin:5px 0 0;
-      font-size:13px;
-      color:rgba(255,255,255,.82);
-    }
-
-    .actions{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .pill{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      padding:9px 12px;
-      border-radius:999px;
-      background:rgba(255,255,255,.12);
-      border:1px solid rgba(255,255,255,.12);
-      font-size:12px;
-    }
-
-    .dot{
-      width:8px;
-      height:8px;
-      border-radius:50%;
-      background:#74ffc1;
-    }
-
-    .btn{
-      border:none;
-      border-radius:999px;
-      padding:10px 16px;
-      font-weight:700;
-      cursor:pointer;
-      background:#fff;
-      color:var(--green);
-    }
-
-    .config{
-      margin-top:14px;
-      background:rgba(255,255,255,.12);
-      border:1px solid rgba(255,255,255,.12);
-      border-radius:14px;
-      padding:12px 14px;
-      font-size:12px;
-      color:rgba(255,255,255,.88);
-    }
-
-    .bar{
-      display:none;
-      margin-bottom:14px;
-      padding:12px 14px;
-      border-radius:14px;
-      border:1px solid;
-      font-size:13px;
-    }
-
-    .loading{display:flex;align-items:center;gap:10px;background:var(--green-soft);color:var(--green);border-color:rgba(1,83,79,.12)}
-    .error{background:var(--red-soft);color:var(--red);border-color:rgba(163,45,45,.18)}
-    .empty{background:var(--amber-soft);color:#8d5a10;border-color:rgba(185,116,24,.18)}
-
-    .spinner{
-      width:16px;height:16px;border-radius:50%;
-      border:2px solid rgba(1,83,79,.18);
-      border-top-color:var(--green);
-      animation:spin .8s linear infinite;
-    }
-    @keyframes spin{to{transform:rotate(360deg)}}
-
-    .filters{
-      background:rgba(255,255,255,.88);
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:14px;
-      box-shadow:var(--shadow);
-      margin-bottom:16px;
-    }
-
-    .filters-title{
-      font-size:12px;
-      color:var(--muted);
-      text-transform:uppercase;
-      letter-spacing:.05em;
-      font-weight:800;
-      margin-bottom:10px;
-    }
-
-    .filters-grid{
-      display:grid;
-      grid-template-columns:1.4fr 1fr 1fr auto;
-      gap:10px;
-      align-items:end;
-    }
-
-    .field label{
-      display:block;
-      margin-bottom:6px;
-      font-size:11px;
-      font-weight:700;
-      text-transform:uppercase;
-      color:var(--muted);
-      letter-spacing:.04em;
-    }
-
-    .field input,.field select{
-      width:100%;
-      height:42px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:#fff;
-      padding:0 12px;
-      font-size:13px;
-      color:var(--ink);
-      outline:none;
-    }
-
-    .field input:focus,.field select:focus{
-      border-color:rgba(1,83,79,.35);
-      box-shadow:0 0 0 4px rgba(1,83,79,.08);
-    }
-
-    .btn-secondary{
-      background:#edf2ee;
-      color:var(--muted);
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:11px 14px;
-      font-weight:700;
-      cursor:pointer;
-    }
-
-    .summary{
-      margin-top:10px;
-      font-size:12px;
-      color:var(--faint);
-    }
-
-    .kpis{
-      display:grid;
-      grid-template-columns:repeat(6,minmax(0,1fr));
-      gap:12px;
-      margin-bottom:16px;
-    }
-
-    .kpi{
-      background:var(--surface);
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:16px;
-      box-shadow:var(--shadow);
-    }
-
-    .kpi-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:8px;
-      margin-bottom:12px;
-    }
-
-    .kpi-label{
-      font-size:11px;
-      text-transform:uppercase;
-      color:var(--muted);
-      font-weight:700;
-      letter-spacing:.05em;
-    }
-
-    .kpi-icon{
-      width:28px;height:28px;border-radius:10px;
-      display:flex;align-items:center;justify-content:center;
-      font-size:13px;
-    }
-
-    .kpi-value{
-      font-size:30px;
-      line-height:1;
-      font-weight:800;
-      margin-bottom:6px;
-    }
-
-    .kpi-sub{
-      font-size:12px;
-      color:var(--faint);
-      min-height:18px;
-    }
-
-    .grid-2{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:12px;
-      margin-bottom:12px;
-    }
-
-    .card{
-      background:var(--surface);
-      border:1px solid var(--line);
-      border-radius:20px;
-      padding:18px;
-      box-shadow:var(--shadow);
-    }
-
-    .card-head{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-bottom:14px;
-    }
-
-    .card h3{
-      margin:0;
-      font-size:12px;
-      text-transform:uppercase;
-      letter-spacing:.05em;
-      color:var(--muted);
-    }
-
-    .card-note{
-      font-size:11px;
-      color:var(--faint);
-    }
-
-    .chart-wrap{
-      position:relative;
-      width:100%;
-    }
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      font-size:13px;
-    }
-
-    thead th{
-      text-align:left;
-      font-size:11px;
-      color:var(--muted);
-      text-transform:uppercase;
-      letter-spacing:.05em;
-      padding:10px 8px;
-      border-bottom:1px solid var(--line);
-      position:sticky;
-      top:0;
-      background:#fff;
-    }
-
-    tbody td{
-      padding:10px 8px;
-      border-bottom:1px solid #f0f1ee;
-      vertical-align:top;
-    }
-
-    tbody tr:hover{
-      background:#fafbf9;
-    }
-
-    .table-wrap{
-      overflow:auto;
-      max-height:520px;
-      border-radius:14px;
-      border:1px solid #f0f1ee;
-    }
-
-    .tag{
-      display:inline-block;
-      padding:4px 8px;
-      border-radius:999px;
-      font-size:11px;
-      font-weight:700;
-      white-space:nowrap;
-    }
-
-    .tag-pendiente{background:var(--amber-soft);color:var(--amber)}
-    .tag-enviado{background:var(--green-soft);color:var(--green)}
-    .tag-respondido{background:var(--blue-soft);color:var(--blue)}
-    .tag-reunion{background:var(--purple-soft);color:var(--purple)}
-    .tag-oportunidad{background:#fff1de;color:#9a5e08}
-    .tag-cerrado{background:#e6f6f1;color:#0b6a58}
-    .tag-otro{background:#f0f1ee;color:#666}
-
-    .muted{color:var(--muted)}
-    .small{font-size:12px;color:var(--faint)}
-    .note{
-      max-width:320px;
-      white-space:normal;
-      line-height:1.35;
-    }
-
-    @media (max-width:1180px){
-      .kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
-      .filters-grid{grid-template-columns:1fr 1fr}
-    }
-
-    @media (max-width:780px){
-      .wrap{padding:18px 12px 34px}
-      .hero{padding:18px}
-      .brand h1{font-size:19px}
-      .brand img{height:28px}
-      .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
-      .grid-2{grid-template-columns:1fr}
-      .filters-grid{grid-template-columns:1fr}
-    }
-
-    @media (max-width:520px){
-      .kpis{grid-template-columns:1fr}
-    }
-  </style>
+<style>
+:root{
+  --green:#01534f; --green-soft:#e8f5f1;
+  --blue:#185FA5; --blue-soft:#eaf2fc;
+  --purple:#534AB7; --purple-soft:#f1effd;
+  --amber:#b97418; --amber-soft:#fff2df;
+  --red:#a32d2d; --red-soft:#fdeeee;
+  --ink:#171816; --muted:#686b66; --faint:#969b95;
+  --surface:#fff; --line:rgba(10,20,15,.08);
+  --bg:#f5f6f4; --shadow:0 10px 24px rgba(10,20,15,.05);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+.wrap{max-width:1280px;margin:0 auto;padding:22px 18px 40px}
+.hero{background:linear-gradient(135deg,#01534f 0%,#0c655e 60%,#185FA5 100%);color:#fff;border-radius:22px;padding:20px;box-shadow:var(--shadow);margin-bottom:18px}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.brand img{height:34px;width:auto;display:block;filter:brightness(0) invert(1)}
+.brand h1{margin:0;font-size:22px;line-height:1.1}
+.brand p{margin:5px 0 0;font-size:13px;color:rgba(255,255,255,.82)}
+.actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pill-live{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:999px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.12);font-size:12px}
+.dot{width:8px;height:8px;border-radius:50%;background:#74ffc1}
+.btn{border:none;border-radius:999px;padding:10px 16px;font-weight:700;cursor:pointer;background:#fff;color:var(--green)}
+.config{margin-top:14px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px 14px;font-size:12px;color:rgba(255,255,255,.88)}
+.config code{background:rgba(255,255,255,.16);border-radius:6px;padding:2px 6px;color:#fff}
+.bar{display:none;margin-bottom:14px;padding:12px 14px;border-radius:14px;border:1px solid;font-size:13px}
+.loading{display:flex;align-items:center;gap:10px;background:var(--green-soft);color:var(--green);border-color:rgba(1,83,79,.12)}
+.error{background:var(--red-soft);color:var(--red);border-color:rgba(163,45,45,.18)}
+.empty{background:var(--amber-soft);color:#8d5a10;border-color:rgba(185,116,24,.18)}
+.spinner{width:16px;height:16px;border-radius:50%;border:2px solid rgba(1,83,79,.18);border-top-color:var(--green);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.filters{background:rgba(255,255,255,.88);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:var(--shadow);margin-bottom:16px}
+.filters-title{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:800;margin-bottom:10px}
+.filters-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:10px;align-items:end}
+.field label{display:block;margin-bottom:6px;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.04em}
+.field input,.field select{width:100%;height:42px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:0 12px;font-size:13px;color:var(--ink);outline:none}
+.btn-secondary{background:#edf2ee;color:var(--muted);border:1px solid var(--line);border-radius:12px;padding:11px 14px;font-weight:700;cursor:pointer}
+.summary{margin-top:10px;font-size:12px;color:var(--faint)}
+.kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.kpi-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.kpi-label{font-size:11px;text-transform:uppercase;color:var(--muted);font-weight:700;letter-spacing:.05em}
+.kpi-icon{width:28px;height:28px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px}
+.kpi-value{font-size:30px;line-height:1;font-weight:800;margin-bottom:6px}
+.kpi-sub{font-size:12px;color:var(--faint);min-height:18px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.card h3{margin:0;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.card-note{font-size:11px;color:var(--faint)}
+.chart-wrap{position:relative;width:100%}
+.insight-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:12px}
+.insight{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:var(--shadow)}
+.insight-label{font-size:11px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.insight-value{font-size:26px;font-weight:800}
+.insight-sub{font-size:12px;color:var(--faint);margin-top:4px}
+@media(max-width:1180px){.kpis{grid-template-columns:repeat(3,minmax(0,1fr))}.filters-grid{grid-template-columns:1fr 1fr}.insight-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:780px){.wrap{padding:18px 12px 34px}.brand h1{font-size:19px}.brand img{height:28px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-2{grid-template-columns:1fr}.filters-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.kpis,.insight-grid{grid-template-columns:1fr}}
+</style>
 </head>
+
 <body>
-  <div class="wrap">
-    <section class="hero">
-      <div class="hero-top">
-        <div class="brand">
-          <img src="01.%20Logo%20(1).png" alt="SnailStep">
-          <div>
-            <h1>Dashboard CRM · Semana de la Movilidad 2026</h1>
-            <p>Seguimiento en vivo de contactos externos de SnailStep</p>
-          </div>
-        </div>
+<div class="wrap">
 
-        <div class="actions">
-          <div class="pill">
-            <span class="dot"></span>
-            <span id="sync-time">Cargando datos...</span>
-          </div>
-          <button class="btn" id="sync-btn" type="button">↻ Actualizar</button>
-        </div>
+<section class="hero">
+  <div class="hero-top">
+    <div class="brand">
+      <img src="01.%20Logo%20(1).png" alt="SnailStep">
+      <div>
+        <h1>Dashboard CRM · Semana de la Movilidad 2026</h1>
+        <p>Seguimiento visual de contactos externos de SnailStep</p>
       </div>
-
-      <div class="config">
-        <strong>Fuente:</strong> Google Sheets · Documento
-        <code>1awKfnzTY6ZfELZGs1QlD-WlmeW3apBOf</code> · Pestaña
-        <code>Externos</code>
-      </div>
-    </section>
-
-    <div id="loading-bar" class="bar loading">
-      <div class="spinner"></div>
-      Leyendo datos de Google Sheets...
     </div>
 
-    <div id="error-bar" class="bar error"></div>
-    <div id="empty-bar" class="bar empty"></div>
-
-    <section class="filters" id="filters-wrap" style="display:none;">
-      <div class="filters-title">Filtros</div>
-      <div class="filters-grid">
-        <div class="field">
-          <label for="search-input">Buscar</label>
-          <input id="search-input" type="text" placeholder="Ciudad, contacto, email o notas">
-        </div>
-
-        <div class="field">
-          <label for="estado-filter">Estado</label>
-          <select id="estado-filter">
-            <option value="all">Todos</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="ccaa-filter">CCAA</label>
-          <select id="ccaa-filter">
-            <option value="all">Todas</option>
-          </select>
-        </div>
-
-        <button class="btn-secondary" id="clear-filters-btn" type="button">Limpiar</button>
+    <div class="actions">
+      <div class="pill-live">
+        <span class="dot"></span>
+        <span id="sync-time">Cargando datos...</span>
       </div>
-      <div class="summary" id="filter-summary">Sin filtros activos.</div>
-    </section>
-
-    <main id="main" style="display:none;">
-      <section class="kpis" id="kpis"></section>
-
-      <section class="grid-2">
-        <div class="card">
-          <div class="card-head">
-            <h3>Embudo comercial</h3>
-            <div class="card-note">Estados del pipeline actual</div>
-          </div>
-          <div class="chart-wrap" style="height:280px;">
-            <canvas id="chart-estados"></canvas>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-head">
-            <h3>Contactos por CCAA</h3>
-            <div class="card-note">Volumen territorial</div>
-          </div>
-          <div class="chart-wrap" style="height:280px;">
-            <canvas id="chart-ccaa"></canvas>
-          </div>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="card-head">
-          <h3>Registros</h3>
-          <div class="card-note">Vista operativa del CRM</div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Ciudad</th>
-                <th>CCAA</th>
-                <th>Contacto</th>
-                <th>Email</th>
-                <th>Estado</th>
-                <th>Fecha</th>
-                <th>Resultado email</th>
-                <th>Notas</th>
-              </tr>
-            </thead>
-            <tbody id="table-body"></tbody>
-          </table>
-        </div>
-      </section>
-    </main>
-
-    <section id="empty-state" class="card" style="display:none;text-align:center;">
-      <div style="font-size:32px;margin-bottom:10px;">📭</div>
-      <h3 style="margin:0 0 8px;">No hay datos suficientes</h3>
-      <p class="muted" style="margin:0;">Revisa que la hoja tenga registros válidos.</p>
-    </section>
+      <button class="btn" id="sync-btn" type="button">↻ Actualizar</button>
+    </div>
   </div>
 
-  <script>
-    const SHEET_ID = '1awKfnzTY6ZfELZGs1QlD-WlmeW3apBOf';
-    const GID = '2016444956';
-    const REFRESH_MS = 5 * 60 * 1000;
+  <div class="config">
+    <strong>Fuente:</strong> Google Sheets · Documento
+    <code>1awKfnzTY6ZfELZGs1QlD-WlmeW3apBOf</code> · GID
+    <code>2016444956</code>
+  </div>
+</section>
 
-    let charts = {};
-    let isLoading = false;
-    let normalizedRows = [];
-    let autoRefreshHandle = null;
+<div id="loading-bar" class="bar loading">
+  <div class="spinner"></div>
+  Leyendo datos de Google Sheets...
+</div>
 
-    const CCAA_MAP = {
-      'Madrid':'Comunidad de Madrid',
-      'Barcelona':'Cataluña',
-      'Valencia':'Comunidad Valenciana',
-      'València':'Comunidad Valenciana',
-      'Sevilla':'Andalucía',
-      'Zaragoza':'Aragón',
-      'Málaga':'Andalucía',
-      'Murcia':'Región de Murcia',
-      'Palma':'Illes Balears',
-      'Bilbao':'País Vasco',
-      'Alicante':'Comunidad Valenciana',
-      'Córdoba':'Andalucía',
-      'Valladolid':'Castilla y León',
-      'Vigo':'Galicia',
-      'Vitoria-Gasteiz':'País Vasco',
-      'A Coruña':'Galicia',
-      'Terrassa':'Cataluña',
-      'Badalona':'Cataluña',
-      'Cartagena':'Región de Murcia',
-      'Santa Cruz de Tenerife':'Canarias',
-      'Almería':'Andalucía',
-      'Alcalá de Henares':'Comunidad de Madrid',
-      'Burgos':'Castilla y León',
-      'Albacete':'Castilla-La Mancha',
-      'Santander':'Cantabria',
-      'Tarragona':'Cataluña',
-      'Cádiz':'Andalucía',
-      'Santa Coloma de Gramenet':'Cataluña',
-      'Torrevieja':'Comunidad Valenciana',
-      'Santiago de Compostela':'Galicia',
-      'Avilés':'Asturias',
-      'Valdemoro':'Comunidad de Madrid',
-      'Vilanova i la Geltrú':'Cataluña',
-      'Viladecans':'Cataluña',
-      'Benidorm':'Comunidad Valenciana',
-      'Calvià':'Illes Balears',
-      'Alzira':'Comunidad Valenciana',
-      'Tres Cantos':'Comunidad de Madrid',
-      'Alcantarilla':'Región de Murcia',
-      'Basauri':'País Vasco',
-      'Sestao':'País Vasco',
-      'Vilafranca del Penedès':'Cataluña',
-      'Barberà del Vallès':'Cataluña',
-      'Villena':'Comunidad Valenciana',
-      'Almendralejo':'Extremadura',
-      'Barañáin':'Navarra',
-      'Santiponce':'Andalucía',
-      'Calp':'Comunidad Valenciana',
-      'Adra':'Andalucía',
-      'Alboraya':'Comunidad Valenciana',
-      'Valls':'Cataluña',
-      'Vila-seca':'Cataluña',
-      'Abrera':'Cataluña',
-      'Vic':'Cataluña',
-      'Berga':'Cataluña',
-      'Ames':'Galicia',
-      'Carballo':'Galicia',
-      'Sitges':'Cataluña',
-      'Alella':'Cataluña',
-      'Alguaire':'Cataluña',
-      'Almenar':'Cataluña',
-      'Astillero':'Cantabria'
+<div id="error-bar" class="bar error"></div>
+<div id="empty-bar" class="bar empty"></div>
+
+<section class="filters" id="filters-wrap" style="display:none;">
+  <div class="filters-title">Filtros</div>
+  <div class="filters-grid">
+    <div class="field">
+      <label for="search-input">Buscar</label>
+      <input id="search-input" type="text" placeholder="Ciudad, contacto, email, notas o resultado">
+    </div>
+
+    <div class="field">
+      <label for="estado-filter">Estado</label>
+      <select id="estado-filter">
+        <option value="all">Todos</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="ccaa-filter">CCAA</label>
+      <select id="ccaa-filter">
+        <option value="all">Todas</option>
+      </select>
+    </div>
+
+    <button class="btn-secondary" id="clear-filters-btn" type="button">Limpiar</button>
+  </div>
+  <div class="summary" id="filter-summary">Sin filtros activos.</div>
+</section>
+
+<main id="main" style="display:none;">
+  <section class="kpis" id="kpis"></section>
+
+  <section class="insight-grid" id="insights"></section>
+
+  <section class="grid-2">
+    <div class="card">
+      <div class="card-head">
+        <h3>Embudo comercial</h3>
+        <div class="card-note">Estado + Resultado de Email</div>
+      </div>
+      <div class="chart-wrap" style="height:300px;">
+        <canvas id="chart-estados"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>Resultado de Email</h3>
+        <div class="card-note">Categorías reales de seguimiento</div>
+      </div>
+      <div class="chart-wrap" style="height:300px;">
+        <canvas id="chart-resultados"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid-2">
+    <div class="card">
+      <div class="card-head">
+        <h3>Contactos por CCAA</h3>
+        <div class="card-note">Volumen territorial</div>
+      </div>
+      <div class="chart-wrap" style="height:320px;">
+        <canvas id="chart-ccaa"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h3>España vs Internacional</h3>
+        <div class="card-note">Distribución del pipeline</div>
+      </div>
+      <div class="chart-wrap" style="height:320px;">
+        <canvas id="chart-global"></canvas>
+      </div>
+    </div>
+  </section>
+</main>
+
+<section id="empty-state" class="card" style="display:none;text-align:center;">
+  <div style="font-size:32px;margin-bottom:10px;">📭</div>
+  <h3 style="margin:0 0 8px;">No hay datos suficientes</h3>
+  <p style="margin:0;color:var(--muted);">Revisa que la hoja tenga registros válidos.</p>
+</section>
+
+</div>
+
+<script>
+const SHEET_ID = '1awKfnzTY6ZfELZGs1QlD-WlmeW3apBOf';
+const GID = '2016444956';
+const REFRESH_MS = 5 * 60 * 1000;
+
+let charts = {};
+let isLoading = false;
+let normalizedRows = [];
+let autoRefreshHandle = null;
+
+const CCAA_MAP = {
+  'Madrid':'Comunidad de Madrid',
+  'Barcelona':'Cataluña',
+  'Valencia':'Comunidad Valenciana',
+  'València':'Comunidad Valenciana',
+  'Sevilla':'Andalucía',
+  'Zaragoza':'Aragón',
+  'Málaga':'Andalucía',
+  'Murcia':'Región de Murcia',
+  'Palma':'Illes Balears',
+  'Bilbao':'País Vasco',
+  'Alicante':'Comunidad Valenciana',
+  'Córdoba':'Andalucía',
+  'Valladolid':'Castilla y León',
+  'Vigo':'Galicia',
+  'Vitoria-Gasteiz':'País Vasco',
+  'A Coruña':'Galicia',
+  'Terrassa':'Cataluña',
+  'Badalona':'Cataluña',
+  'Cartagena':'Región de Murcia',
+  'Santa Cruz de Tenerife':'Canarias',
+  'Almería':'Andalucía',
+  'Alcalá de Henares':'Comunidad de Madrid',
+  'Burgos':'Castilla y León',
+  'Albacete':'Castilla-La Mancha',
+  'Santander':'Cantabria',
+  'Tarragona':'Cataluña',
+  'Cádiz':'Andalucía',
+  'Santa Coloma de Gramenet':'Cataluña',
+  'Torrevieja':'Comunidad Valenciana',
+  'Santiago de Compostela':'Galicia',
+  'Avilés':'Asturias',
+  'Astillero':'Cantabria',
+  'Abrera':'Cataluña',
+  'Arbúcies':'Cataluña',
+  'Argelaguer':'Cataluña',
+  'Arenys de mar':'Cataluña',
+  'Bellvís':'Cataluña',
+  'Benidorm':'Comunidad Valenciana',
+  'Calp':'Comunidad Valenciana'
+};
+
+function escapeHTML(value = '') {
+  return String(value)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+function normalizeText(value = '') {
+  return String(value)
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'');
+}
+
+function normalizeHeader(header = '') {
+  return normalizeText(header)
+    .replace(/[^\w\s]/g,' ')
+    .replace(/\s+/g,'_')
+    .replace(/^_+|_+$/g,'');
+}
+
+function parseNumber(value) {
+  const clean = String(value ?? '').replace(/[^\d]/g,'').trim();
+  return clean ? Number(clean) : 0;
+}
+
+function pick(obj, keys) {
+  for (const key of keys) {
+    if (obj[key] && String(obj[key]).trim()) return String(obj[key]).trim();
+  }
+  return '';
+}
+
+function isSpain(country) {
+  const c = normalizeText(country);
+  return c === 'spain' || c === 'espana' || c === 'españa';
+}
+
+function getCCAA(city) {
+  if (!city) return 'Otras';
+  return CCAA_MAP[String(city).trim()] || 'Otras';
+}
+
+function normalizeEstado(value = '') {
+  const e = normalizeText(value);
+  if (e.includes('cerrado')) return 'cerrado';
+  if (e.includes('oportun')) return 'oportunidad';
+  if (e.includes('reuni')) return 'reunion';
+  if (e.includes('respond')) return 'respondido';
+  if (e.includes('enviado')) return 'enviado';
+  if (e.includes('pendiente')) return 'pendiente';
+  return 'otro';
+}
+
+function estadoLabel(v = '') {
+  switch(v){
+    case 'pendiente': return 'Pendiente';
+    case 'enviado': return 'Enviado';
+    case 'respondido': return 'Respondido';
+    case 'reunion': return 'Reunión';
+    case 'oportunidad': return 'Oportunidad';
+    case 'cerrado': return 'Cerrado';
+    default: return 'Otro';
+  }
+}
+
+function normalizeResultado(value = '') {
+  const r = normalizeText(value);
+
+  if (!r) return 'sin_resultado';
+  if (r.includes('respond')) return 'respondido';
+  if (r.includes('reuni')) return 'reunion';
+  if (r.includes('llam')) return 'llamada';
+  if (r.includes('cerrado')) return 'cerrado';
+  if (r.includes('error') || r.includes('no existe') || r.includes('rebote')) return 'email_no_valido';
+  if (r.includes('solicitud')) return 'solicitud';
+  if (r.includes('pendiente')) return 'pendiente';
+
+  return r.replace(/\s+/g,'_').slice(0,30);
+}
+
+function resultadoLabel(v = '') {
+  switch(v){
+    case 'sin_resultado': return 'Sin resultado';
+    case 'respondido': return 'Respondido';
+    case 'reunion': return 'Reunión';
+    case 'llamada': return 'Llamada';
+    case 'cerrado': return 'Cerrado';
+    case 'email_no_valido': return 'Email no válido';
+    case 'solicitud': return 'Solicitud';
+    case 'pendiente': return 'Pendiente';
+    default: return String(v).replace(/_/g,' ');
+  }
+}
+
+function isActivo(estado = '') {
+  const n = normalizeEstado(estado);
+  return ['enviado','respondido','reunion','oportunidad','cerrado'].includes(n);
+}
+
+function isRespondido(row) {
+  return row.estadoNorm === 'respondido' || row.resultadoNorm === 'respondido';
+}
+
+function isReunion(row) {
+  return row.estadoNorm === 'reunion' || row.resultadoNorm === 'reunion';
+}
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let cell = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (char === '"') {
+      if (inQuotes && next === '"') {
+        cell += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      row.push(cell);
+      cell = '';
+    } else if ((char === '\n' || char === '\r') && !inQuotes) {
+      if (char === '\r' && next === '\n') i++;
+      row.push(cell);
+      rows.push(row);
+      row = [];
+      cell = '';
+    } else {
+      cell += char;
+    }
+  }
+
+  if (cell.length || row.length) {
+    row.push(cell);
+    rows.push(row);
+  }
+
+  return rows;
+}
+
+function destroyCharts() {
+  Object.values(charts).forEach(chart => {
+    if (chart && typeof chart.destroy === 'function') chart.destroy();
+  });
+  charts = {};
+}
+
+function showBar(id, message = '') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (message) el.innerHTML = message;
+  el.style.display = 'block';
+}
+
+function hideBar(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.display = 'none';
+  el.innerHTML = '';
+}
+
+function showEmptyState(show) {
+  document.getElementById('empty-state').style.display = show ? 'block' : 'none';
+  document.getElementById('main').style.display = show ? 'none' : 'block';
+  document.getElementById('filters-wrap').style.display = show ? 'none' : 'block';
+}
+
+function normalizeRows(rows) {
+  return rows.map(row => {
+    const estadoNorm = normalizeEstado(row.estado || '');
+    const resultadoNorm = normalizeResultado(row.resultado || '');
+
+    return {
+      pais: String(row.pais || '').trim(),
+      ciudad: String(row.ciudad || '').trim(),
+      poblacion: parseNumber(row.poblacion),
+      contacto: String(row.contacto || '').trim(),
+      email: String(row.email || '').trim(),
+      telefono: String(row.telefono || '').trim(),
+      estado: String(row.estado || '').trim(),
+      estadoNorm,
+      fecha: String(row.fecha || '').trim(),
+      resultado: String(row.resultado || '').trim(),
+      resultadoNorm,
+      notas: String(row.notas || '').trim(),
+      proximo: String(row.proximo || '').trim(),
+      ccaa: getCCAA(row.ciudad || ''),
+      activo: isActivo(row.estado || '')
     };
+  });
+}
 
-    function escapeHTML(value = '') {
-      return String(value)
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;')
-        .replace(/'/g,'&#39;');
+function populateFilters(rows) {
+  const estadoSelect = document.getElementById('estado-filter');
+  const ccaaSelect = document.getElementById('ccaa-filter');
+
+  const estados = [...new Set(rows.map(r => r.estadoNorm).filter(Boolean))]
+    .sort((a,b) => a.localeCompare(b,'es'));
+
+  const ccaas = [...new Set(rows.filter(r => isSpain(r.pais)).map(r => r.ccaa).filter(Boolean))]
+    .sort((a,b) => a.localeCompare(b,'es'));
+
+  estadoSelect.innerHTML = '<option value="all">Todos</option>' +
+    estados.map(v => `<option value="${escapeHTML(v)}">${escapeHTML(estadoLabel(v))}</option>`).join('');
+
+  ccaaSelect.innerHTML = '<option value="all">Todas</option>' +
+    ccaas.map(v => `<option value="${escapeHTML(v)}">${escapeHTML(v)}</option>`).join('');
+}
+
+function getFilteredRows() {
+  const search = normalizeText(document.getElementById('search-input').value);
+  const estado = document.getElementById('estado-filter').value;
+  const ccaa = document.getElementById('ccaa-filter').value;
+
+  return normalizedRows.filter(row => {
+    const matchEstado = estado === 'all' || row.estadoNorm === estado;
+    const matchCCAA = ccaa === 'all' || row.ccaa === ccaa;
+    const matchSearch = !search || [row.ciudad, row.contacto, row.email, row.notas, row.proximo, row.resultado]
+      .some(v => normalizeText(v).includes(search));
+    return matchEstado && matchCCAA && matchSearch;
+  });
+}
+
+function updateFilterSummary(rows) {
+  const search = document.getElementById('search-input').value.trim();
+  const estado = document.getElementById('estado-filter').value;
+  const ccaa = document.getElementById('ccaa-filter').value;
+
+  const active = [];
+  if (search) active.push(`búsqueda: "${search}"`);
+  if (estado !== 'all') active.push(`estado: ${estadoLabel(estado)}`);
+  if (ccaa !== 'all') active.push(`CCAA: ${ccaa}`);
+
+  document.getElementById('filter-summary').textContent = active.length
+    ? `${rows.length} registros tras filtros · ${active.join(' · ')}`
+    : `${rows.length} registros · sin filtros activos`;
+}
+
+function renderKPIs(data) {
+  const items = [
+    {label:'Total España', value:data.totalSpain, sub:'contactos en CRM', color:'var(--ink)', icon:'🇪🇸', bg:'#f2f4ef'},
+    {label:'Enviados', value:data.enviados, sub:'contactos activados', color:'var(--green)', icon:'✉️', bg:'var(--green-soft)'},
+    {label:'Respondidos', value:data.respondidos, sub:'Estado o resultado email', color:'var(--blue)', icon:'💬', bg:'var(--blue-soft)'},
+    {label:'Reuniones', value:data.reuniones, sub:'contactos cualificados', color:'var(--purple)', icon:'📅', bg:'var(--purple-soft)'},
+    {label:'Emails no válidos', value:data.emailNoValido, sub:'incidencias detectadas', color:'var(--red)', icon:'⚠️', bg:'var(--red-soft)'},
+    {label:'Pendientes', value:data.pendientes, sub:'por activar', color:'var(--amber)', icon:'⏳', bg:'var(--amber-soft)'}
+  ];
+
+  document.getElementById('kpis').innerHTML = items.map(item => `
+    <div class="kpi">
+      <div class="kpi-head">
+        <div class="kpi-label">${escapeHTML(item.label)}</div>
+        <div class="kpi-icon" style="background:${item.bg};color:${item.color};">${item.icon}</div>
+      </div>
+      <div class="kpi-value" style="color:${item.color};">${Number(item.value).toLocaleString('es-ES')}</div>
+      <div class="kpi-sub">${escapeHTML(item.sub)}</div>
+    </div>
+  `).join('');
+}
+
+function renderInsights(data) {
+  document.getElementById('insights').innerHTML = `
+    <div class="insight">
+      <div class="insight-label">Tasa de respuesta</div>
+      <div class="insight-value">${data.totalSpain ? Math.round(data.respondidos / data.totalSpain * 100) : 0}%</div>
+      <div class="insight-sub">respondidos sobre contactos España</div>
+    </div>
+    <div class="insight">
+      <div class="insight-label">Tasa de reunión</div>
+      <div class="insight-value">${data.totalSpain ? Math.round(data.reuniones / data.totalSpain * 100) : 0}%</div>
+      <div class="insight-sub">reuniones sobre contactos España</div>
+    </div>
+    <div class="insight">
+      <div class="insight-label">Activación</div>
+      <div class="insight-value">${data.totalSpain ? Math.round(data.activos / data.totalSpain * 100) : 0}%</div>
+      <div class="insight-sub">enviados o fase superior</div>
+    </div>
+    <div class="insight">
+      <div class="insight-label">Pipeline global</div>
+      <div class="insight-value">${data.totalGlobal.toLocaleString('es-ES')}</div>
+      <div class="insight-sub">registros totales</div>
+    </div>
+  `;
+}
+
+function renderEstadosChart(data) {
+  const labels = ['Pendientes','Enviados','Respondidos','Reuniones','Oportunidades','Cerrados'];
+  const values = [data.pendientes, data.enviados, data.respondidos, data.reuniones, data.oportunidades, data.cerrados];
+
+  charts.estados = new Chart(document.getElementById('chart-estados'), {
+    type:'bar',
+    data:{labels,datasets:[{data:values,backgroundColor:['#b97418','#01534f','#185FA5','#534AB7','#d5962b','#0b6a58'],borderRadius:8}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{beginAtZero:true,ticks:{precision:0}}}}
+  });
+}
+
+function renderResultadosChart(rows) {
+  const map = {};
+  rows.filter(r => isSpain(r.pais)).forEach(r => {
+    const key = r.resultadoNorm || 'sin_resultado';
+    map[key] = (map[key] || 0) + 1;
+  });
+
+  const arr = Object.entries(map).sort((a,b) => b[1]-a[1]);
+
+  charts.resultados = new Chart(document.getElementById('chart-resultados'), {
+    type:'bar',
+    data:{
+      labels: arr.map(x => resultadoLabel(x[0])),
+      datasets:[{data:arr.map(x => x[1]),backgroundColor:'#185FA5',borderRadius:8}]
+    },
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0}},y:{grid:{display:false}}}}
+  });
+}
+
+function renderCcaaChart(spainRows) {
+  const map = {};
+  spainRows.forEach(r => {
+    const key = r.ccaa || 'Otras';
+    map[key] = (map[key] || 0) + 1;
+  });
+
+  const arr = Object.entries(map).sort((a,b) => b[1]-a[1]).slice(0,12);
+
+  charts.ccaa = new Chart(document.getElementById('chart-ccaa'), {
+    type:'bar',
+    data:{labels:arr.map(x=>x[0]),datasets:[{data:arr.map(x=>x[1]),backgroundColor:'#01534f',borderRadius:8}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{beginAtZero:true,ticks:{precision:0}},y:{grid:{display:false}}}}
+  });
+}
+
+function renderGlobalChart(rows) {
+  const espana = rows.filter(r => isSpain(r.pais)).length;
+  const internacional = rows.length - espana;
+
+  charts.global = new Chart(document.getElementById('chart-global'), {
+    type:'doughnut',
+    data:{labels:['España','Internacional'],datasets:[{data:[espana,internacional],backgroundColor:['#01534f','#E6EAE3'],borderWidth:0}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{position:'bottom'}}}
+  });
+}
+
+function renderDashboard(rows) {
+  destroyCharts();
+
+  const spainRows = rows.filter(r => isSpain(r.pais));
+
+  if (!rows.length) {
+    showEmptyState(true);
+    showBar('empty-bar', '⚠️ Los filtros actuales no devuelven resultados.');
+    return;
+  }
+
+  showEmptyState(false);
+  hideBar('empty-bar');
+
+  const pendientes = spainRows.filter(r => r.estadoNorm === 'pendiente').length;
+  const enviados = spainRows.filter(r => r.estadoNorm === 'enviado').length;
+  const respondidos = spainRows.filter(r => isRespondido(r)).length;
+  const reuniones = spainRows.filter(r => isReunion(r)).length;
+  const oportunidades = spainRows.filter(r => r.estadoNorm === 'oportunidad').length;
+  const cerrados = spainRows.filter(r => r.estadoNorm === 'cerrado' || r.resultadoNorm === 'cerrado').length;
+  const emailNoValido = spainRows.filter(r => r.resultadoNorm === 'email_no_valido').length;
+  const activos = spainRows.filter(r => r.activo).length;
+
+  const data = {
+    totalSpain: spainRows.length,
+    totalGlobal: rows.length,
+    pendientes,
+    enviados,
+    respondidos,
+    reuniones,
+    oportunidades,
+    cerrados,
+    emailNoValido,
+    activos
+  };
+
+  renderKPIs(data);
+  renderInsights(data);
+  renderEstadosChart(data);
+  renderResultadosChart(rows);
+  renderCcaaChart(spainRows);
+  renderGlobalChart(rows);
+  updateFilterSummary(rows);
+}
+
+async function fetchSheetCSV() {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 15000);
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}&cachebust=${Date.now()}`;
+
+  try {
+    const res = await fetch(url, { cache:'no-store', signal:controller.signal });
+    clearTimeout(timeout);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.text();
+  } catch (e) {
+    clearTimeout(timeout);
+    throw e;
+  }
+}
+
+async function loadData() {
+  if (isLoading) return;
+  isLoading = true;
+
+  const btn = document.getElementById('sync-btn');
+  btn.classList.add('loading');
+  btn.textContent = '↻ Cargando...';
+
+  hideBar('error-bar');
+  hideBar('empty-bar');
+  showBar('loading-bar');
+
+  try {
+    const text = await fetchSheetCSV();
+    const parsed = parseCSV(text);
+
+    if (!parsed.length || parsed.length < 2) {
+      showEmptyState(true);
+      hideBar('loading-bar');
+      showBar('empty-bar', '⚠️ La hoja está vacía o no contiene suficientes filas.');
+      document.getElementById('sync-time').textContent = 'Sin datos válidos';
+      return;
     }
 
-    function normalizeText(value = '') {
-      return String(value)
-        .trim()
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g,'');
-    }
+    const headers = parsed[0].map(h => normalizeHeader(h));
 
-    function normalizeHeader(header = '') {
-      return normalizeText(header)
-        .replace(/[^\w\s]/g,' ')
-        .replace(/\s+/g,'_')
-        .replace(/^_+|_+$/g,'');
-    }
-
-    function parseNumber(value) {
-      const clean = String(value ?? '').replace(/[^\d]/g,'').trim();
-      return clean ? Number(clean) : 0;
-    }
-
-    function pick(obj, keys) {
-      for (const key of keys) {
-        if (obj[key] && String(obj[key]).trim()) return String(obj[key]).trim();
-      }
-      return '';
-    }
-
-    function isSpain(country) {
-      const c = normalizeText(country);
-      return c === 'spain' || c === 'espana' || c === 'españa';
-    }
-
-    function getCCAA(city) {
-      if (!city) return 'Otras';
-      return CCAA_MAP[String(city).trim()] || 'Otras';
-    }
-
-    function normalizeEstado(value = '') {
-      const e = normalizeText(value);
-      if (e.includes('cerrado')) return 'cerrado';
-      if (e.includes('oportun')) return 'oportunidad';
-      if (e.includes('reuni')) return 'reunion';
-      if (e.includes('respond')) return 'respondido';
-      if (e.includes('enviado')) return 'enviado';
-      if (e.includes('pendiente')) return 'pendiente';
-      return 'otro';
-    }
-
-    function estadoLabel(v = '') {
-      switch(v){
-        case 'pendiente': return 'Pendiente';
-        case 'enviado': return 'Enviado';
-        case 'respondido': return 'Respondido';
-        case 'reunion': return 'Reunión';
-        case 'oportunidad': return 'Oportunidad';
-        case 'cerrado': return 'Cerrado';
-        default: return 'Otro';
-      }
-    }
-
-    function estadoClass(v = '') {
-      return `tag-${v || 'otro'}`;
-    }
-
-    function isActivo(estado = '') {
-      const n = normalizeEstado(estado);
-      return ['enviado','respondido','reunion','oportunidad','cerrado'].includes(n);
-    }
-
-    function parseDateSmart(value = '') {
-      const raw = String(value).trim();
-      if (!raw) return null;
-
-      if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return new Date(raw + 'T00:00:00');
-
-      const dmy = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-      if (dmy) {
-        const [,d,m,y] = dmy;
-        return new Date(`${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}T00:00:00`);
-      }
-
-      const fallback = new Date(raw);
-      return Number.isNaN(fallback.getTime()) ? null : fallback;
-    }
-
-    function formatDate(date) {
-      if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
-      return date.toLocaleDateString('es-ES');
-    }
-
-    function parseCSV(text) {
-      const rows = [];
-      let row = [];
-      let cell = '';
-      let inQuotes = false;
-
-      for (let i = 0; i < text.length; i++) {
-        const char = text[i];
-        const next = text[i + 1];
-
-        if (char === '"') {
-          if (inQuotes && next === '"') {
-            cell += '"';
-            i++;
-          } else {
-            inQuotes = !inQuotes;
-          }
-        } else if (char === ',' && !inQuotes) {
-          row.push(cell);
-          cell = '';
-        } else if ((char === '\n' || char === '\r') && !inQuotes) {
-          if (char === '\r' && next === '\n') i++;
-          row.push(cell);
-          rows.push(row);
-          row = [];
-          cell = '';
-        } else {
-          cell += char;
-        }
-      }
-
-      if (cell.length || row.length) {
-        row.push(cell);
-        rows.push(row);
-      }
-
-      return rows;
-    }
-
-    function destroyCharts() {
-      Object.values(charts).forEach(chart => {
-        if (chart && typeof chart.destroy === 'function') chart.destroy();
-      });
-      charts = {};
-    }
-
-    function showBar(id, message = '') {
-      const el = document.getElementById(id);
-      if (!el) return;
-      if (message) el.innerHTML = message;
-      el.style.display = 'block';
-    }
-
-    function hideBar(id) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      el.style.display = 'none';
-      el.innerHTML = '';
-    }
-
-    function showEmptyState(show) {
-      document.getElementById('empty-state').style.display = show ? 'block' : 'none';
-      document.getElementById('main').style.display = show ? 'none' : 'block';
-      document.getElementById('filters-wrap').style.display = show ? 'none' : 'block';
-    }
-
-    function normalizeRows(rows) {
-      return rows.map(row => {
-        const fechaObj = parseDateSmart(row.fecha || '');
-        const estadoNorm = normalizeEstado(row.estado || '');
+    const rows = parsed.slice(1)
+      .filter(row => row.some(cell => String(cell || '').trim()))
+      .map(row => {
+        const obj = {};
+        headers.forEach((header, i) => {
+          obj[header] = String(row[i] || '').trim();
+        });
 
         return {
-          pais: String(row.pais || '').trim(),
-          ciudad: String(row.ciudad || '').trim(),
-          poblacion: parseNumber(row.poblacion),
-          contacto: String(row.contacto || '').trim(),
-          email: String(row.email || '').trim(),
-          telefono: String(row.telefono || '').trim(),
-          estado: String(row.estado || '').trim(),
-          estadoNorm,
-          fecha: String(row.fecha || '').trim(),
-          fechaObj,
-          resultado: String(row.resultado || '').trim(),
-          notas: String(row.notas || '').trim(),
-          ccaa: getCCAA(row.ciudad || ''),
-          activo: isActivo(row.estado || '')
+          pais: pick(obj, ['spain','pais','país','country']),
+          ciudad: pick(obj, ['ciudad','municipio','city']),
+          poblacion: pick(obj, ['poblacion','población','habitantes','population']),
+          contacto: pick(obj, ['contacto','persona_contacto','responsable','contact']),
+          email: pick(obj, ['email','correo','correo_electronico','mail']),
+          telefono: pick(obj, ['telefono','teléfono','movil','móvil','phone']),
+          estado: pick(obj, ['estado','estado_contacto','status']),
+          fecha: pick(obj, ['fecha','fecha_envio','fecha_de_envio','date']),
+          resultado: pick(obj, ['resultado_de_email','resultado_email','resultado','resultado_del_email']),
+          notas: pick(obj, ['notas','nota','observaciones','comments']),
+          proximo: pick(obj, ['proximo_paso','próximo_paso','proximo paso','próximo paso','siguiente_paso','next_step'])
         };
       });
-    }
 
-    function populateFilters(rows) {
-      const estadoSelect = document.getElementById('estado-filter');
-      const ccaaSelect = document.getElementById('ccaa-filter');
+    normalizedRows = normalizeRows(rows);
+    populateFilters(normalizedRows);
+    renderDashboard(getFilteredRows());
 
-      const estados = [...new Set(rows.map(r => r.estadoNorm).filter(Boolean))]
-        .sort((a,b) => a.localeCompare(b,'es'));
-
-      const ccaas = [...new Set(rows.filter(r => isSpain(r.pais)).map(r => r.ccaa).filter(Boolean))]
-        .sort((a,b) => a.localeCompare(b,'es'));
-
-      estadoSelect.innerHTML = '<option value="all">Todos</option>' +
-        estados.map(v => `<option value="${escapeHTML(v)}">${escapeHTML(estadoLabel(v))}</option>`).join('');
-
-      ccaaSelect.innerHTML = '<option value="all">Todas</option>' +
-        ccaas.map(v => `<option value="${escapeHTML(v)}">${escapeHTML(v)}</option>`).join('');
-    }
-
-    function getFilteredRows() {
-      const search = normalizeText(document.getElementById('search-input').value);
-      const estado = document.getElementById('estado-filter').value;
-      const ccaa = document.getElementById('ccaa-filter').value;
-
-      return normalizedRows.filter(row => {
-        const matchEstado = estado === 'all' || row.estadoNorm === estado;
-        const matchCCAA = ccaa === 'all' || row.ccaa === ccaa;
-        const matchSearch = !search || [row.ciudad, row.contacto, row.email, row.resultado, row.notas]
-          .some(v => normalizeText(v).includes(search));
-        return matchEstado && matchCCAA && matchSearch;
-      });
-    }
-
-    function updateFilterSummary(rows) {
-      const search = document.getElementById('search-input').value.trim();
-      const estado = document.getElementById('estado-filter').value;
-      const ccaa = document.getElementById('ccaa-filter').value;
-
-      const active = [];
-      if (search) active.push(`búsqueda: "${search}"`);
-      if (estado !== 'all') active.push(`estado: ${estadoLabel(estado)}`);
-      if (ccaa !== 'all') active.push(`CCAA: ${ccaa}`);
-
-      document.getElementById('filter-summary').textContent = active.length
-        ? `${rows.length} registros tras filtros · ${active.join(' · ')}`
-        : `${rows.length} registros · sin filtros activos`;
-    }
-
-    function renderKPIs(data) {
-      const items = [
-        {label:'Total España', value:data.totalSpain, sub:'contactos en CRM', color:'var(--ink)', icon:'🇪🇸', bg:'#f2f4ef'},
-        {label:'Enviados', value:data.enviados, sub:'contactos activados', color:'var(--green)', icon:'✉️', bg:'var(--green-soft)'},
-        {label:'Respondidos', value:data.respondidos, sub:'contactos con respuesta', color:'var(--blue)', icon:'💬', bg:'var(--blue-soft)'},
-        {label:'Reuniones', value:data.reuniones, sub:'contactos cualificados', color:'var(--purple)', icon:'📅', bg:'var(--purple-soft)'},
-        {label:'Pendientes', value:data.pendientes, sub:'por activar', color:'var(--amber)', icon:'⏳', bg:'var(--amber-soft)'},
-        {label:'Pipeline global', value:data.totalGlobal, sub:`en ${data.countryCount} países`, color:'var(--ink)', icon:'🌍', bg:'#f2f4ef'}
-      ];
-
-      document.getElementById('kpis').innerHTML = items.map(item => `
-        <div class="kpi">
-          <div class="kpi-head">
-            <div class="kpi-label">${escapeHTML(item.label)}</div>
-            <div class="kpi-icon" style="background:${item.bg};color:${item.color};">${item.icon}</div>
-          </div>
-          <div class="kpi-value" style="color:${item.color};">${Number(item.value).toLocaleString('es-ES')}</div>
-          <div class="kpi-sub">${escapeHTML(item.sub)}</div>
-        </div>
-      `).join('');
-    }
-
-    function renderEstadosChart(data) {
-      const labels = ['Pendientes','Enviados','Respondidos','Reuniones','Oportunidades','Cerrados'];
-      const values = [data.pendientes, data.enviados, data.respondidos, data.reuniones, data.oportunidades, data.cerrados];
-
-      charts.estados = new Chart(document.getElementById('chart-estados'), {
-        type:'bar',
-        data:{
-          labels,
-          datasets:[{
-            data: values,
-            backgroundColor:['#b97418','#01534f','#185FA5','#534AB7','#d5962b','#0b6a58'],
-            borderRadius:8
-          }]
-        },
-        options:{
-          responsive:true,
-          maintainAspectRatio:false,
-          plugins:{legend:{display:false}},
-          scales:{
-            x:{grid:{display:false}},
-            y:{beginAtZero:true, ticks:{precision:0}}
-          }
-        }
-      });
-    }
-
-    function renderCcaaChart(spainRows) {
-      const map = {};
-      spainRows.forEach(r => {
-        const key = r.ccaa || 'Otras';
-        map[key] = (map[key] || 0) + 1;
+    hideBar('loading-bar');
+    document.getElementById('sync-time').textContent =
+      'Actualizado: ' + new Date().toLocaleTimeString('es-ES', {
+        hour:'2-digit',
+        minute:'2-digit',
+        second:'2-digit'
       });
 
-      const arr = Object.entries(map).sort((a,b) => b[1]-a[1]).slice(0,12);
+  } catch (error) {
+    showEmptyState(true);
+    hideBar('loading-bar');
+    showBar('error-bar', `⚠️ No se pudo conectar con Google Sheets: <strong>${escapeHTML(error.message)}</strong>`);
+    document.getElementById('sync-time').textContent = 'Error de conexión';
+  } finally {
+    btn.classList.remove('loading');
+    btn.textContent = '↻ Actualizar';
+    isLoading = false;
+  }
+}
 
-      charts.ccaa = new Chart(document.getElementById('chart-ccaa'), {
-        type:'bar',
-        data:{
-          labels: arr.map(x => x[0]),
-          datasets:[{
-            data: arr.map(x => x[1]),
-            backgroundColor:'#185FA5',
-            borderRadius:8
-          }]
-        },
-        options:{
-          indexAxis:'y',
-          responsive:true,
-          maintainAspectRatio:false,
-          plugins:{legend:{display:false}},
-          scales:{
-            x:{beginAtZero:true, ticks:{precision:0}},
-            y:{grid:{display:false}}
-          }
-        }
-      });
-    }
+function applyFilters() {
+  renderDashboard(getFilteredRows());
+}
 
-    function renderTable(rows) {
-      const body = document.getElementById('table-body');
-      body.innerHTML = rows.map(r => `
-        <tr>
-          <td><strong>${escapeHTML(r.ciudad)}</strong><div class="small">${r.poblacion ? r.poblacion.toLocaleString('es-ES') + ' hab.' : ''}</div></td>
-          <td>${escapeHTML(r.ccaa)}</td>
-          <td>${escapeHTML(r.contacto || '-')}</td>
-          <td>${r.email ? `<a href="mailto:${escapeHTML(r.email)}">${escapeHTML(r.email)}</a>` : '<span class="muted">-</span>'}</td>
-          <td><span class="tag ${estadoClass(r.estadoNorm)}">${escapeHTML(estadoLabel(r.estadoNorm))}</span></td>
-          <td>${escapeHTML(formatDate(r.fechaObj) || r.fecha || '-')}</td>
-          <td>${escapeHTML(r.resultado || '-')}</td>
-          <td class="note">${escapeHTML(r.notas || '-')}</td>
-        </tr>
-      `).join('');
-    }
+document.getElementById('sync-btn').addEventListener('click', loadData);
+document.getElementById('search-input').addEventListener('input', applyFilters);
+document.getElementById('estado-filter').addEventListener('change', applyFilters);
+document.getElementById('ccaa-filter').addEventListener('change', applyFilters);
 
-    function renderDashboard(rows) {
-      destroyCharts();
+document.getElementById('clear-filters-btn').addEventListener('click', () => {
+  document.getElementById('search-input').value = '';
+  document.getElementById('estado-filter').value = 'all';
+  document.getElementById('ccaa-filter').value = 'all';
+  applyFilters();
+});
 
-      const spainRows = rows.filter(r => isSpain(r.pais));
+loadData();
+if (autoRefreshHandle) clearInterval(autoRefreshHandle);
+autoRefreshHandle = setInterval(loadData, REFRESH_MS);
+</script>
 
-      if (!rows.length) {
-        showEmptyState(true);
-        showBar('empty-bar', '⚠️ Los filtros actuales no devuelven resultados.');
-        return;
-      }
-
-      showEmptyState(false);
-      hideBar('empty-bar');
-
-      const pendientes = spainRows.filter(r => r.estadoNorm === 'pendiente').length;
-      const enviados = spainRows.filter(r => r.estadoNorm === 'enviado').length;
-      const respondidos = spainRows.filter(r => r.estadoNorm === 'respondido').length;
-      const reuniones = spainRows.filter(r => r.estadoNorm === 'reunion').length;
-      const oportunidades = spainRows.filter(r => r.estadoNorm === 'oportunidad').length;
-      const cerrados = spainRows.filter(r => r.estadoNorm === 'cerrado').length;
-
-      const countryMap = {};
-      rows.forEach(r => {
-        const key = r.pais || 'Desconocido';
-        countryMap[key] = (countryMap[key] || 0) + 1;
-      });
-
-      renderKPIs({
-        totalSpain: spainRows.length,
-        totalGlobal: rows.length,
-        enviados,
-        respondidos,
-        reuniones,
-        pendientes,
-        oportunidades,
-        cerrados,
-        countryCount: Object.keys(countryMap).length
-      });
-
-      renderEstadosChart({pendientes,enviados,respondidos,reuniones,oportunidades,cerrados});
-      renderCcaaChart(spainRows);
-      renderTable(rows);
-      updateFilterSummary(rows);
-    }
-
-    async function fetchSheetCSV() {
-      const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}&cachebust=${Date.now()}`;
-      const res = await fetch(url, { cache:'no-store' });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return await res.text();
-    }
-
-    async function loadData() {
-      if (isLoading) return;
-      isLoading = true;
-
-      const btn = document.getElementById('sync-btn');
-      btn.classList.add('loading');
-      btn.textContent = '↻ Cargando...';
-
-      hideBar('error-bar');
-      hideBar('empty-bar');
-      showBar('loading-bar');
-
-      try {
-        const text = await fetchSheetCSV();
-        const parsed = parseCSV(text);
-
-        if (!parsed.length || parsed.length < 2) {
-          showEmptyState(true);
-          hideBar('loading-bar');
-          showBar('empty-bar', '⚠️ La hoja está vacía o no contiene suficientes filas.');
-          document.getElementById('sync-time').textContent = 'Sin datos válidos';
-          return;
-        }
-
-        const headers = parsed[0].map(h => normalizeHeader(h));
-
-        const rows = parsed.slice(1)
-          .filter(row => row.some(cell => String(cell || '').trim()))
-          .map(row => {
-            const obj = {};
-            headers.forEach((header, i) => {
-              obj[header] = String(row[i] || '').trim();
-            });
-
-            return {
-              pais: pick(obj, ['spain','pais','país','country']),
-              ciudad: pick(obj, ['ciudad','municipio','city']),
-              poblacion: pick(obj, ['poblacion','población','habitantes','population']),
-              contacto: pick(obj, ['contacto','persona_contacto','responsable','contact']),
-              email: pick(obj, ['email','correo','correo_electronico','mail']),
-              telefono: pick(obj, ['telefono','teléfono','movil','móvil','phone']),
-              estado: pick(obj, ['estado','estado_contacto','status']),
-              fecha: pick(obj, ['fecha','fecha_envio','fecha_de_envio','date']),
-              resultado: pick(obj, ['resultado_de_email','resultado_email','resultado']),
-              notas: pick(obj, ['notas','nota','observaciones','comments'])
-            };
-          });
-
-        normalizedRows = normalizeRows(rows);
-        populateFilters(normalizedRows);
-        renderDashboard(getFilteredRows());
-
-        hideBar('loading-bar');
-        document.getElementById('sync-time').textContent =
-          'Actualizado: ' + new Date().toLocaleTimeString('es-ES', {
-            hour:'2-digit',
-            minute:'2-digit',
-            second:'2-digit'
-          });
-
-      } catch (error) {
-        showEmptyState(true);
-        hideBar('loading-bar');
-        showBar('error-bar', `⚠️ No se pudo conectar con Google Sheets: <strong>${escapeHTML(error.message)}</strong>`);
-        document.getElementById('sync-time').textContent = 'Error de conexión';
-      } finally {
-        btn.classList.remove('loading');
-        btn.textContent = '↻ Actualizar';
-        isLoading = false;
-      }
-    }
-
-    function applyFilters() {
-      renderDashboard(getFilteredRows());
-    }
-
-    document.getElementById('sync-btn').addEventListener('click', loadData);
-    document.getElementById('search-input').addEventListener('input', applyFilters);
-    document.getElementById('estado-filter').addEventListener('change', applyFilters);
-    document.getElementById('ccaa-filter').addEventListener('change', applyFilters);
-
-    document.getElementById('clear-filters-btn').addEventListener('click', () => {
-      document.getElementById('search-input').value = '';
-      document.getElementById('estado-filter').value = 'all';
-      document.getElementById('ccaa-filter').value = 'all';
-      applyFilters();
-    });
-
-    loadData();
-    if (autoRefreshHandle) clearInterval(autoRefreshHandle);
-    autoRefreshHandle = setInterval(loadData, REFRESH_MS);
-  </script>
 </body>
 </html>
